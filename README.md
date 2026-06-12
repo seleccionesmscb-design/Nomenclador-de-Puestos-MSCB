@@ -12,3 +12,20 @@ Uso interno de la Dirección de Recursos Humanos de la MSCB. Permite que cualqui
 Google Apps Script · HTML/CSS/JS · Google Sheets como base de datos
 
 ## Estructura de archivos
+Codigo.gs          → lógica del servidor (funciones GAS)
+Nomenclador.html   → interfaz principal del sistema
+
+## Hojas de Google Sheets requeridas
+BD_Nomenclador           → 412 unidades jerárquicas con tipoPuesto asignado
+25 Puestos               → descripciones genéricas de los 25 puestos
+BD_Puestos_NoJerarquicos → 392 cargos no jerárquicos activos
+
+## Cómo desplegar
+1. Copiá los archivos en un proyecto de Google Apps Script
+2. Actualizá SPREADSHEET_ID_NOMENCLADOR en Codigo.gs con el ID de tu Google Sheet
+3. Verificá que los nombres de las hojas coincidan con las constantes HOJA_BD_NOM, HOJA_25_PUESTOS, HOJA_NO_JER
+4. Desplegar → Nueva implementación → Aplicación web
+
+## Pendiente
+- Logo en el sidebar
+- Incorporar vista de organigrama completo
