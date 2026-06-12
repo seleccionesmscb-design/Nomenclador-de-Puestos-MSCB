@@ -141,3 +141,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+# Credenciales y configuración local
+.clasp.json
+appsscript.json
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
