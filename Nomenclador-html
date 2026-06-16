@@ -386,6 +386,23 @@ body {
 .icon-svg { width: 1em; height: 1em; display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
 .nc-tag .icon-svg, .chip .icon-svg, .det-section-title .icon-svg, .header-btn .icon-svg { margin-right: 3px; }
 .nom-card .icon-svg, .area-card .icon-svg, .org-node .icon-svg, .card-inicio .icon-svg { stroke-width: 1.6; }
+
+/* ── Impresión / Exportar PDF de la ficha de un cargo ── */
+.solo-impresion { display: none; }
+.print-header { margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--navy); }
+.print-nombre { font-size: 18px; font-weight: 700; color: var(--navy); }
+.print-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+@media print {
+  body * { visibility: hidden; }
+  .solo-impresion, .solo-impresion * { visibility: visible; }
+  .solo-impresion {
+    display: block;
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+    padding: 20px;
+  }
+  .det-section { margin-bottom: 16px; }
+}
 </style>
 </head>
 <body>
@@ -682,6 +699,9 @@ body {
   </div>
 </div>
 
+<!-- Contenido solo para impresión / PDF -->
+<div id="detalle-print" class="solo-impresion"></div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -751,7 +771,24 @@ function inicializarUI() {
   renderizarAreas();
   renderizarCategorias();
   renderizarOrganigrama();
+  abrirDesdeUrl();
 }
+
+function abrirDesdeUrl() {
+  var params = new URLSearchParams(window.location.search);
+  var cargo = params.get('cargo');
+  if (cargo) abrirDetalle(cargo, params.get('tipo') || undefined, true);
+}
+
+window.addEventListener('popstate', function(){
+  var params = new URLSearchParams(window.location.search);
+  var cargo = params.get('cargo');
+  if (cargo) {
+    abrirDetalle(cargo, params.get('tipo') || undefined, true);
+  } else {
+    cerrarDetalle(null, true);
+  }
+});
 
 // ============================================================
 // ESTADÍSTICAS
@@ -933,7 +970,7 @@ function renderizarNomenclador() {
 // ============================================================
 // PANEL DE DETALLE — lógica nueva cargo + puesto genérico
 // ============================================================
-function abrirDetalle(codigo, tipoRegistro) {
+function abrirDetalle(codigo, tipoRegistro, sinUrl) {
   document.getElementById('detalle-header').innerHTML =
     '<div style="display:flex;align-items:center;gap:12px;padding:4px 0">' +
     '<div class="spinner" style="width:24px;height:24px;border-width:2px"></div>' +
@@ -944,6 +981,13 @@ function abrirDetalle(codigo, tipoRegistro) {
   document.getElementById('detalle-tabs').style.display = 'none';
   document.getElementById('detalle-overlay').classList.add('abierto');
   document.body.style.overflow = 'hidden';
+
+  if (!sinUrl) {
+    var url = new URL(window.location.href);
+    url.searchParams.set('cargo', codigo);
+    if (tipoRegistro) url.searchParams.set('tipo', tipoRegistro); else url.searchParams.delete('tipo');
+    history.pushState({ cargo: codigo, tipo: tipoRegistro }, '', url);
+  }
 
   google.script.run
     .withSuccessHandler(onDetalleLoaded)
@@ -974,6 +1018,8 @@ function onDetalleLoaded(resp) {
       '<div class="dh-nombre">' + (d.nombreCargo || '') + '</div>' +
       '<div class="dh-codigo">' + (d.codigo || '') +
         '<button class="copy-btn" onclick="copiarCodigo(\'' + esc(d.codigo) + '\')" title="Copiar"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
+        '<button class="copy-btn" onclick="copiarEnlace(\'' + esc(d.codigo) + '\')" title="Copiar enlace para compartir"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>' +
+        '<button class="copy-btn" onclick="imprimirFicha()" title="Imprimir / Exportar PDF"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>' +
       '</div>' +
     '</div>' +
     '<button class="detalle-close" onclick="cerrarDetalle()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
@@ -990,10 +1036,18 @@ function onDetalleFail() {
     '<button class="detalle-close" onclick="cerrarDetalle()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
 }
 
-function cerrarDetalle(e) {
+function cerrarDetalle(e, sinUrl) {
   if (e && e.target !== document.getElementById('detalle-overlay')) return;
   document.getElementById('detalle-overlay').classList.remove('abierto');
   document.body.style.overflow = '';
+  if (!sinUrl) {
+    var url = new URL(window.location.href);
+    if (url.searchParams.has('cargo')) {
+      url.searchParams.delete('cargo');
+      url.searchParams.delete('tipo');
+      history.pushState({}, '', url);
+    }
+  }
 }
 
 function cambiarTab(tab) {
@@ -1171,6 +1225,38 @@ function copiarCodigo(codigo) {
   navigator.clipboard.writeText(codigo).then(function(){
     mostrarToast('C\xF3digo ' + codigo + ' copiado', false);
   });
+}
+
+function copiarEnlace(codigo) {
+  var url = new URL(window.location.href);
+  url.searchParams.set('cargo', codigo);
+  if (puestoDetalle && puestoDetalle.tipoRegistro) url.searchParams.set('tipo', puestoDetalle.tipoRegistro);
+  navigator.clipboard.writeText(url.toString()).then(function(){
+    mostrarToast('Enlace copiado al portapapeles', false);
+  });
+}
+
+function imprimirFicha() {
+  if (!puestoDetalle) return;
+  var savedTab = tabDetalle;
+  var body = document.getElementById('detalle-body');
+  var full = '';
+  ['descripcion', 'info', 'requisitos', 'contexto'].forEach(function(t){
+    renderizarTabDetalle(t);
+    full += body.innerHTML;
+  });
+  renderizarTabDetalle(savedTab);
+  document.querySelectorAll('.det-tab').forEach(function(t){ t.classList.remove('activo'); });
+  document.getElementById('tab-' + savedTab).classList.add('activo');
+
+  document.getElementById('detalle-print').innerHTML =
+    '<div class="print-header">' +
+      '<div class="print-nombre">' + (puestoDetalle.nombreCargo || '') + '</div>' +
+      '<div class="print-meta">' + (puestoDetalle.codigo || '') + ' &middot; ' + (puestoDetalle.nivel || '') +
+        (puestoDetalle.tipoPuesto ? ' &middot; ' + puestoDetalle.tipoPuesto : '') +
+      '</div>' +
+    '</div>' + full;
+  window.print();
 }
 
 function solicitarModificacion(codigo) {
