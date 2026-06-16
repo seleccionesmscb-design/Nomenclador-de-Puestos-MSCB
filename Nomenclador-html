@@ -712,6 +712,15 @@ var DATOS_SERVIDOR = (function(){
   catch(e){ return []; }
 })();
 
+// URL pública real de la app (la ventana sandbox de GAS no expone esta URL vía window.location)
+var APP_URL = '<?= appUrl ?>';
+var CARGO_INICIAL = (function(){
+  try { return JSON.parse('<?= cargoInicial ?>'); } catch(e){ return ''; }
+})();
+var TIPO_INICIAL = (function(){
+  try { return JSON.parse('<?= tipoInicial ?>'); } catch(e){ return ''; }
+})();
+
 // ============================================================
 // CONFIGURACIÓN
 // ============================================================
@@ -775,20 +784,10 @@ function inicializarUI() {
 }
 
 function abrirDesdeUrl() {
-  var params = new URLSearchParams(window.location.search);
-  var cargo = params.get('cargo');
-  if (cargo) abrirDetalle(cargo, params.get('tipo') || undefined, true);
+  // CARGO_INICIAL viene del servidor (doGet lee ?cargo=&tipo= de la URL real),
+  // porque la app corre en un iframe sandbox cuya window.location no es la URL pública.
+  if (CARGO_INICIAL) abrirDetalle(CARGO_INICIAL, TIPO_INICIAL || undefined, true);
 }
-
-window.addEventListener('popstate', function(){
-  var params = new URLSearchParams(window.location.search);
-  var cargo = params.get('cargo');
-  if (cargo) {
-    abrirDetalle(cargo, params.get('tipo') || undefined, true);
-  } else {
-    cerrarDetalle(null, true);
-  }
-});
 
 // ============================================================
 // ESTADÍSTICAS
@@ -982,13 +981,6 @@ function abrirDetalle(codigo, tipoRegistro, sinUrl) {
   document.getElementById('detalle-overlay').classList.add('abierto');
   document.body.style.overflow = 'hidden';
 
-  if (!sinUrl) {
-    var url = new URL(window.location.href);
-    url.searchParams.set('cargo', codigo);
-    if (tipoRegistro) url.searchParams.set('tipo', tipoRegistro); else url.searchParams.delete('tipo');
-    history.pushState({ cargo: codigo, tipo: tipoRegistro }, '', url);
-  }
-
   google.script.run
     .withSuccessHandler(onDetalleLoaded)
     .withFailureHandler(onDetalleFail)
@@ -1036,18 +1028,10 @@ function onDetalleFail() {
     '<button class="detalle-close" onclick="cerrarDetalle()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
 }
 
-function cerrarDetalle(e, sinUrl) {
+function cerrarDetalle(e) {
   if (e && e.target !== document.getElementById('detalle-overlay')) return;
   document.getElementById('detalle-overlay').classList.remove('abierto');
   document.body.style.overflow = '';
-  if (!sinUrl) {
-    var url = new URL(window.location.href);
-    if (url.searchParams.has('cargo')) {
-      url.searchParams.delete('cargo');
-      url.searchParams.delete('tipo');
-      history.pushState({}, '', url);
-    }
-  }
 }
 
 function cambiarTab(tab) {
@@ -1228,7 +1212,10 @@ function copiarCodigo(codigo) {
 }
 
 function copiarEnlace(codigo) {
-  var url = new URL(window.location.href);
+  // Se usa APP_URL (la URL pública real /exec, inyectada por el servidor) en vez de
+  // window.location, porque la app corre en un iframe sandbox de GAS cuya URL interna
+  // (googleusercontent.com) no es navegable ni compartible.
+  var url = new URL(APP_URL);
   url.searchParams.set('cargo', codigo);
   if (puestoDetalle && puestoDetalle.tipoRegistro) url.searchParams.set('tipo', puestoDetalle.tipoRegistro);
   navigator.clipboard.writeText(url.toString()).then(function(){

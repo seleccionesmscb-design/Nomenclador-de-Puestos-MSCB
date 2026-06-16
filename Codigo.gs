@@ -28,6 +28,11 @@ function doGet(e) {
   } catch (err) {
     template.datosInyectados = '[]';
   }
+  template.appUrl = ScriptApp.getService().getUrl();
+  var cargoInicial = (e && e.parameter && e.parameter.cargo) ? String(e.parameter.cargo) : '';
+  var tipoInicial  = (e && e.parameter && e.parameter.tipo)  ? String(e.parameter.tipo)  : '';
+  template.cargoInicial = JSON.stringify(cargoInicial);
+  template.tipoInicial  = JSON.stringify(tipoInicial);
   return template.evaluate()
     .setTitle('Nomenclador Municipal — MSCB')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
