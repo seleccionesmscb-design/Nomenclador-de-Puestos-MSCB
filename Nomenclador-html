@@ -285,7 +285,8 @@ body {
 .org-container { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; max-width: 100%; }
 .org-toolbar { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
 .org-toolbar select { border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 6px 10px; font-size: 12px; font-family: Segoe UI, Arial, sans-serif; color: var(--text); outline: none; cursor: pointer; }
-.org-area { min-height: 500px; padding: 32px; overflow-x: auto; display: flex; justify-content: safe center; align-items: flex-start; max-width: 100%; }
+.org-area { min-height: 500px; padding: 32px; overflow-x: auto; display: flex; justify-content: flex-start; align-items: flex-start; max-width: 100%; }
+.org-area > div { margin: 0 auto; }
 .org-area::-webkit-scrollbar { height: 8px; }
 .org-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 .org-tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
@@ -298,8 +299,9 @@ body {
 .org-children {
   display: flex;
   flex-wrap: nowrap;
-  justify-content: safe center;
+  justify-content: flex-start;
   gap: 18px;
+  margin: 0 auto;
 }
 .org-child {
   position: relative;
@@ -708,6 +710,7 @@ var ordenActual = 'nombre';
 var vistaActual = 'inicio';
 var puestoDetalle = null;
 var tabDetalle = 'descripcion';
+var orgExpandido = {};
 
 // ============================================================
 // INIT
@@ -1263,6 +1266,12 @@ function renderizarCategorias() {
 // ============================================================
 // ORGANIGRAMA
 // ============================================================
+function toggleOrgExpand(ev, codigo) {
+  ev.stopPropagation();
+  orgExpandido[codigo] = true;
+  renderizarOrganigrama();
+}
+
 function renderizarOrganigrama() {
   var area = document.getElementById('org-area');
   var filtroSecOrg = document.getElementById('org-filtro-sec').value;
@@ -1308,7 +1317,7 @@ function renderizarOrganigrama() {
             (subdeps.length > 0 ?
               '<div class="org-stem-down"></div>' +
               '<div class="org-children">' +
-                subdeps.slice(0, 4).map(function(sub){
+                (orgExpandido[d.codigo] ? subdeps : subdeps.slice(0, 4)).map(function(sub){
                   return '<div class="org-child">' +
                     '<div class="org-stem-v"></div>' +
                     '<div class="org-node jefatura" onclick="abrirDetalle(\'' + esc(sub.codigo) + '\')" title="' + (sub.nombreCargo || '') + '" style="min-width:96px;max-width:124px">' +
@@ -1317,10 +1326,10 @@ function renderizarOrganigrama() {
                     '</div>' +
                   '</div>';
                 }).join('') +
-                (subdeps.length > 4 ?
+                (!orgExpandido[d.codigo] && subdeps.length > 4 ?
                   '<div class="org-child">' +
                     '<div class="org-stem-v"></div>' +
-                    '<div class="org-node jefatura" style="font-size:10px;color:var(--text3)">+' + (subdeps.length - 4) + ' m\xE1s</div>' +
+                    '<div class="org-node jefatura" onclick="toggleOrgExpand(event,\'' + esc(d.codigo) + '\')" style="font-size:10px;color:var(--accent);font-weight:700">+' + (subdeps.length - 4) + ' m\xE1s</div>' +
                   '</div>'
                 : '') +
               '</div>'
