@@ -411,7 +411,7 @@ body {
 <aside class="sidebar">
   <div class="sidebar-brand">
     <div class="brand-logo">
-      <img id="sidebar-logo" src="https://drive.google.com/uc?export=view&id=1v1oPBz6JgA9NCd9ms9FeLfHGbE826Ygx" alt="Logo MSCB" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
+      <img id="sidebar-logo" src="https://drive.google.com/thumbnail?id=1v1oPBz6JgA9NCd9ms9FeLfHGbE826Ygx&sz=w200" alt="Logo MSCB" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
     </div>
     <div class="brand-text">
       <div class="brand-name">Municipalidad<br>San Carlos de Bariloche</div>
