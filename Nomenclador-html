@@ -289,6 +289,36 @@ body {
 .org-level { display: flex; gap: 16px; justify-content: center; }
 .org-node-wrap { display: flex; flex-direction: column; align-items: center; }
 .org-connector-v { width: 2px; height: 24px; background: var(--border2); flex-shrink: 0; }
+
+/* ── Conectores de organigrama tipo árbol (línea horizontal entre hermanos + tallos verticales) ── */
+.org-stem-down { width: 2px; height: 22px; background: var(--border2); flex-shrink: 0; }
+.org-children {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 28px;
+}
+.org-child {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.org-child::before,
+.org-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  height: 0;
+  border-top: 2px solid var(--border2);
+}
+.org-child::before { left: -14px; width: calc(50% + 14px); }
+.org-child::after  { right: -14px; width: calc(50% + 14px); }
+.org-child:first-child::before,
+.org-child:last-child::after,
+.org-child:only-child::before,
+.org-child:only-child::after { display: none; }
+.org-stem-v { width: 2px; height: 22px; background: var(--border2); }
 .org-node { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r); padding: 10px 14px; min-width: 130px; max-width: 170px; text-align: center; cursor: pointer; transition: all .2s; box-shadow: var(--sh); }
 .org-node:hover { border-color: var(--accent); box-shadow: var(--sh-lg); }
 .org-node.root { background: var(--navy); border-color: var(--navy); color: #fff; }
@@ -1246,43 +1276,50 @@ function renderizarOrganigrama() {
     if (!grupos[s]) grupos[s] = [];
     grupos[s].push(d);
   });
-  var html = '<div style="display:flex;flex-direction:column;gap:32px;width:100%">';
+  var html = '<div style="display:flex;flex-direction:column;gap:40px;width:100%">';
   Object.keys(grupos).forEach(function(s){
     var partes = s.split('\u2014');
     var nombre = partes[1] ? partes[1].trim() : s;
     var cod    = partes[0].trim();
-    html += '<div>' +
-      '<div style="display:flex;justify-content:center;margin-bottom:12px">' +
+    html += '<div style="display:flex;flex-direction:column;align-items:center">' +
         '<div class="org-node secretaria" style="min-width:180px;max-width:220px">' +
           '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span>' +
           '<div class="on-nombre">' + nombre + '</div>' +
           '<div class="on-codigo">C\xF3d. \xC1REA ' + cod + '</div>' +
         '</div>' +
-      '</div>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">' +
+      '<div class="org-stem-down"></div>' +
+      '<div class="org-children">' +
         grupos[s].map(function(d){
           var subdeps = DATOS.filter(function(sub){
             return (sub.secretaria === d.secretaria)
               && (sub.nivel === 'Departamento' || sub.nivel === 'Divisi\xF3n')
               && String(sub.codigo).startsWith(String(d.codigo).substring(0, 10));
           });
-          return '<div style="display:flex;flex-direction:column;align-items:center">' +
-            '<div class="org-connector-v"></div>' +
+          return '<div class="org-child">' +
+            '<div class="org-stem-v"></div>' +
             '<div class="org-node direccion" onclick="abrirDetalle(\'' + esc(d.codigo) + '\')" title="' + (d.nombreCargo || '') + '">' +
               '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/></svg></span>' +
               '<div class="on-nombre">' + (d.nombreCargo || '').replace('Direcci\xF3n de ', 'Dir. de ').substring(0, 32) + '</div>' +
               '<div class="on-codigo">' + (d.codigo || '') + '</div>' +
             '</div>' +
             (subdeps.length > 0 ?
-              '<div class="org-connector-v"></div>' +
-              '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">' +
+              '<div class="org-stem-down"></div>' +
+              '<div class="org-children">' +
                 subdeps.slice(0, 4).map(function(sub){
-                  return '<div class="org-node jefatura" onclick="abrirDetalle(\'' + esc(sub.codigo) + '\')" style="min-width:100px;max-width:130px">' +
-                    '<div class="on-nombre" style="font-size:10px">' + (sub.nombreCargo || '').substring(0, 28) + '</div>' +
-                    '<div class="on-codigo">' + (sub.codigo || '') + '</div>' +
-                    '</div>';
+                  return '<div class="org-child">' +
+                    '<div class="org-stem-v"></div>' +
+                    '<div class="org-node jefatura" onclick="abrirDetalle(\'' + esc(sub.codigo) + '\')" style="min-width:100px;max-width:130px">' +
+                      '<div class="on-nombre" style="font-size:10px">' + (sub.nombreCargo || '').substring(0, 28) + '</div>' +
+                      '<div class="on-codigo">' + (sub.codigo || '') + '</div>' +
+                    '</div>' +
+                  '</div>';
                 }).join('') +
-                (subdeps.length > 4 ? '<div class="org-node jefatura" style="font-size:10px;color:var(--text3)">+' + (subdeps.length - 4) + ' m\xE1s</div>' : '') +
+                (subdeps.length > 4 ?
+                  '<div class="org-child">' +
+                    '<div class="org-stem-v"></div>' +
+                    '<div class="org-node jefatura" style="font-size:10px;color:var(--text3)">+' + (subdeps.length - 4) + ' m\xE1s</div>' +
+                  '</div>'
+                : '') +
               '</div>'
             : '') +
             '</div>';
