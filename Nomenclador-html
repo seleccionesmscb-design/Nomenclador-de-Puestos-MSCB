@@ -835,7 +835,11 @@ function aplicarFiltroSec(el) {
   el.classList.add('sel'); filtroSec = el.dataset.val; renderizarNomenclador();
 }
 function aplicarOrden(val) { ordenActual = val; renderizarNomenclador(); }
-function buscarGlobal(val) { terminoBusqueda = val; renderizarNomenclador(); }
+function buscarGlobal(val) {
+  terminoBusqueda = val;
+  if (val && vistaActual !== 'nomenclador') navegar('nomenclador');
+  renderizarNomenclador();
+}
 
 var NIVEL_ICONS  = { 'Direcci\xF3n':'&#x1F3DB;','Departamento':'&#x1F5C2;','Divisi\xF3n':'&#x1F4C2;','Secci\xF3n':'&#x1F4C1;' };
 var NIVEL_CLASS  = { 'Direcci\xF3n':'dir','Departamento':'dep','Divisi\xF3n':'div','Secci\xF3n':'sec' };
