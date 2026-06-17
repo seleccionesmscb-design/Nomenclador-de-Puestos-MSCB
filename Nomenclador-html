@@ -401,6 +401,14 @@ body {
     padding: 20px;
   }
   .det-section { margin-bottom: 16px; }
+  /* organigrama: landscape y escalar para que entre */
+  body.imprimiendo-org { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body.imprimiendo-org .solo-impresion { padding: 10px; }
+  body.imprimiendo-org .org-area {
+    overflow: visible !important;
+    transform-origin: top left;
+  }
+  @page { size: A3 landscape; margin: 10mm; }
 }
 </style>
 </head>
@@ -1438,7 +1446,28 @@ function exportarNomenclador() {
   mostrarToast('CSV exportado <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>', false);
 }
 
-function exportarOrg() { mostrarToast('Pr\xF3ximamente: exportar organigrama como PDF', false); }
+function exportarOrg() {
+  var orgArea = document.getElementById('org-area');
+  if (!orgArea || !orgArea.innerHTML.trim()) {
+    mostrarToast('No hay organigrama para exportar', true);
+    return;
+  }
+  var filtroSel = document.getElementById('org-filtro-sec');
+  var filtroLabel = filtroSel && filtroSel.value ? filtroSel.options[filtroSel.selectedIndex].text : 'Todas las Secretarías';
+  var printDiv = document.getElementById('detalle-print');
+  printDiv.innerHTML =
+    '<div class="print-header">' +
+      '<div class="print-nombre">Organigrama Municipal — MSCB</div>' +
+      '<div class="print-meta">' + filtroLabel + ' &nbsp;&middot;&nbsp; ' + new Date().toLocaleDateString('es-AR') + '</div>' +
+    '</div>' +
+    '<div class="org-area" style="overflow:visible;padding:0;min-height:0">' +
+      orgArea.innerHTML +
+    '</div>';
+  document.body.classList.add('imprimiendo-org');
+  window.print();
+  document.body.classList.remove('imprimiendo-org');
+  printDiv.innerHTML = '';
+}
 
 // ============================================================
 // AYUDA
