@@ -35,6 +35,7 @@
   --sh-lg: 0 8px 32px rgba(11,29,58,.12), 0 2px 8px rgba(11,29,58,.06);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: hidden; }
 body {
   font-family: Segoe UI, system-ui, Arial, sans-serif;
   background: var(--bg);
@@ -44,7 +45,7 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
-.app-shell { display: flex; min-height: 100vh; }
+.app-shell { display: flex; min-height: 100vh; min-width: 0; }
 .sidebar {
   width: var(--sidebar-w);
   background: var(--navy);
@@ -119,7 +120,7 @@ body {
 .btn-cta-sidebar .cta-sub { font-size: 9px; font-weight: 400; opacity: .7; margin-top: 1px; }
 .sidebar-footer { padding: 12px 14px; border-top: 1px solid rgba(255,255,255,.06); flex-shrink: 0; }
 .sidebar-footer p { font-size: 9.5px; color: rgba(255,255,255,.25); line-height: 1.5; letter-spacing: .02em; }
-.main-area { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+.main-area { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; min-width: 0; max-width: 100%; overflow-x: hidden; }
 .top-header {
   height: var(--header-h);
   background: var(--surface);
@@ -160,7 +161,7 @@ body {
 .header-btn:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
 .header-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 .header-btn.primary:hover { background: #1e5bcc; box-shadow: 0 3px 10px rgba(45,107,228,.35); }
-.page-content { flex: 1; padding: 24px 28px 48px; }
+.page-content { flex: 1; padding: 24px 28px 48px; min-width: 0; max-width: 100%; }
 .vista { display: none; }
 .vista.activa { display: block; animation: fadeSlide .25s ease; }
 @keyframes fadeSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -281,22 +282,56 @@ body {
 .det-req-item .dr-check { margin-left: auto; font-size: 12px; flex-shrink: 0; }
 .det-req-item.cumple .dr-check { color: var(--green); }
 .det-req-item.no-cumple .dr-check { color: var(--text3); }
-.org-container { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; }
+.org-container { background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; max-width: 100%; }
 .org-toolbar { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
 .org-toolbar select { border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 6px 10px; font-size: 12px; font-family: Segoe UI, Arial, sans-serif; color: var(--text); outline: none; cursor: pointer; }
-.org-area { min-height: 500px; padding: 32px; overflow-x: auto; display: flex; justify-content: center; align-items: flex-start; }
+.org-area { min-height: 500px; padding: 32px; overflow-x: auto; display: flex; justify-content: flex-start; align-items: flex-start; max-width: 100%; }
+.org-area > div { margin: 0 auto; }
+.org-area::-webkit-scrollbar { height: 8px; }
+.org-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 .org-tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
 .org-level { display: flex; gap: 16px; justify-content: center; }
 .org-node-wrap { display: flex; flex-direction: column; align-items: center; }
 .org-connector-v { width: 2px; height: 24px; background: var(--border2); flex-shrink: 0; }
-.org-node { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r); padding: 10px 14px; min-width: 130px; max-width: 170px; text-align: center; cursor: pointer; transition: all .2s; box-shadow: var(--sh); }
+
+/* ── Conectores de organigrama tipo árbol (línea horizontal entre hermanos + tallos verticales) ── */
+.org-stem-down { width: 2px; height: 22px; background: var(--border2); flex-shrink: 0; }
+.org-children {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 18px;
+  margin: 0 auto;
+}
+.org-child {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.org-child::before,
+.org-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  height: 0;
+  border-top: 2px solid var(--border2);
+}
+.org-child::before { left: -9px; width: calc(50% + 9px); }
+.org-child::after  { right: -9px; width: calc(50% + 9px); }
+.org-child:first-child::before,
+.org-child:last-child::after,
+.org-child:only-child::before,
+.org-child:only-child::after { display: none; }
+.org-stem-v { width: 2px; height: 20px; background: var(--border2); }
+.org-node { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r); padding: 8px 10px; min-width: 104px; max-width: 140px; text-align: center; cursor: pointer; transition: all .2s; box-shadow: var(--sh); }
 .org-node:hover { border-color: var(--accent); box-shadow: var(--sh-lg); }
 .org-node.root { background: var(--navy); border-color: var(--navy); color: #fff; }
 .org-node.secretaria { background: #dbeafe; border-color: #93c5fd; }
 .org-node.direccion { background: var(--surface); border-color: var(--border2); }
 .org-node.jefatura { background: var(--surface2); border-color: var(--border); font-size: 11px; }
-.on-icono { font-size: 18px; margin-bottom: 4px; display: block; }
-.on-nombre { font-size: 11px; font-weight: 700; line-height: 1.3; }
+.on-icono { font-size: 16px; margin-bottom: 3px; display: block; }
+.on-nombre { font-size: 10.5px; font-weight: 700; line-height: 1.25; }
 .org-node.root .on-nombre { color: #fff; }
 .org-node.secretaria .on-nombre { color: #1e40af; }
 .on-codigo { font-family: Courier New, monospace; font-size: 9px; color: var(--text3); margin-top: 3px; }
@@ -347,6 +382,26 @@ body {
 .tab-content.activo { display: block; }
 /* Badge de tipo puesto en tarjeta */
 .nc-tag.puesto { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+/* Iconos SVG: heredan tamaño y color del texto contenedor */
+.icon-svg { width: 1em; height: 1em; display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
+.nc-tag .icon-svg, .chip .icon-svg, .det-section-title .icon-svg, .header-btn .icon-svg { margin-right: 3px; }
+.nom-card .icon-svg, .area-card .icon-svg, .org-node .icon-svg, .card-inicio .icon-svg { stroke-width: 1.6; }
+
+/* ── Impresión / Exportar PDF de la ficha de un cargo ── */
+.solo-impresion { display: none; }
+.print-header { margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--navy); }
+.print-nombre { font-size: 18px; font-weight: 700; color: var(--navy); }
+.print-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+@media print {
+  .app-shell, .detalle-overlay, #toast { display: none !important; }
+  .solo-impresion {
+    display: block;
+    position: static;
+    width: 100%;
+    padding: 20px;
+  }
+  .det-section { margin-bottom: 16px; }
+}
 </style>
 </head>
 <body>
@@ -356,7 +411,7 @@ body {
 <aside class="sidebar">
   <div class="sidebar-brand">
     <div class="brand-logo">
-      <img id="sidebar-logo" src="" alt="Logo MSCB" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
+      <img id="sidebar-logo" src="https://drive.google.com/thumbnail?id=1v1oPBz6JgA9NCd9ms9FeLfHGbE826Ygx&sz=w200" alt="Logo MSCB" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
     </div>
     <div class="brand-text">
       <div class="brand-name">Municipalidad<br>San Carlos de Bariloche</div>
@@ -366,33 +421,33 @@ body {
   <nav class="sidebar-nav">
     <div class="nav-section-label">Principal</div>
     <div class="nav-item active" onclick="navegar('inicio')" id="nav-inicio">
-      <span class="nav-icon">&#x1F3E0;</span><span>Inicio</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 21V13h6v8"/></svg></span><span>Inicio</span>
     </div>
     <div class="nav-item" onclick="navegar('organigrama')" id="nav-organigrama">
-      <span class="nav-icon">&#x1F310;</span><span>Organigrama</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Organigrama</span>
     </div>
     <div class="nav-item" onclick="navegar('nomenclador')" id="nav-nomenclador">
-      <span class="nav-icon">&#x1F4CB;</span><span>Nomenclador</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span><span>Nomenclador</span>
       <span class="nav-badge" id="badge-total">&ndash;</span>
     </div>
     <div class="nav-section-label">Explorar</div>
     <div class="nav-item" onclick="navegar('areas')" id="nav-areas">
-      <span class="nav-icon">&#x1F3DB;</span><span>&#xC1;reas / Secretar&#xED;as</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span><span>&#xC1;reas / Secretar&#xED;as</span>
     </div>
     <div class="nav-item" onclick="navegar('categorias')" id="nav-categorias">
-      <span class="nav-icon">&#x1F3F7;</span><span>Categor&#xED;as</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.59a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span>Categor&#xED;as</span>
     </div>
     <div class="nav-item" onclick="navegar('documentacion')" id="nav-documentacion">
-      <span class="nav-icon">&#x1F4C4;</span><span>Documentaci&#xF3;n</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span>Documentaci&#xF3;n</span>
     </div>
     <div class="nav-section-label">Informaci&#xF3;n</div>
     <div class="nav-item" onclick="navegar('info')" id="nav-info">
-      <span class="nav-icon">&#x2139;</span><span>Informaci&#xF3;n adicional</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span>Informaci&#xF3;n adicional</span>
     </div>
   </nav>
   <div class="sidebar-cta">
     <button class="btn-cta-sidebar" onclick="navegar('registro')">
-      <span class="cta-icon">&#x270F;</span>
+      <span class="cta-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span>
       <span class="cta-text">
         <span class="cta-label">Solicitar modificaci&#xF3;n</span>
         <span class="cta-sub">o crear nueva estructura</span>
@@ -413,12 +468,12 @@ body {
       <span class="crumb-current" id="breadcrumb-actual">Inicio</span>
     </div>
     <div class="header-search">
-      <span class="search-icon">&#x1F50D;</span>
+      <span class="search-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
       <input type="text" id="buscador-global" placeholder="Buscar cargo, &#xE1;rea o c&#xF3;digo..." oninput="buscarGlobal(this.value)">
     </div>
     <div class="header-actions">
-      <button class="header-btn" onclick="toggleAyuda()">&#x2753; Ayuda</button>
-      <button class="header-btn primary" onclick="navegar('registro')">&#x271A; Nueva solicitud</button>
+      <button class="header-btn" onclick="toggleAyuda()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Ayuda</button>
+      <button class="header-btn primary" onclick="navegar('registro')"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nueva solicitud</button>
     </div>
   </header>
 
@@ -438,22 +493,22 @@ body {
       </div>
       <div class="cards-inicio">
         <div class="card-inicio" onclick="navegar('organigrama')">
-          <div class="ci-icon" style="background:#dbeafe">&#x1F310;</div>
+          <div class="ci-icon" style="background:#dbeafe"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
           <div><div class="ci-title">Organigrama</div><div class="ci-desc">Visualiz&#xE1; la estructura jer&#xE1;rquica completa del municipio.</div></div>
           <div class="ci-count" id="ci-dirs">&ndash;</div>
         </div>
         <div class="card-inicio" onclick="navegar('nomenclador')">
-          <div class="ci-icon" style="background:#ede9fe">&#x1F4CB;</div>
+          <div class="ci-icon" style="background:#ede9fe"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
           <div><div class="ci-title">Nomenclador</div><div class="ci-desc">Explor&#xE1; todos los cargos con sus funciones y requisitos.</div></div>
           <div class="ci-count" id="ci-puestos">&ndash;</div>
         </div>
         <div class="card-inicio" onclick="navegar('areas')">
-          <div class="ci-icon" style="background:#d1fae5">&#x1F3DB;</div>
+          <div class="ci-icon" style="background:#d1fae5"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></div>
           <div><div class="ci-title">&#xC1;reas</div><div class="ci-desc">Explor&#xE1; las secretar&#xED;as y sus estructuras dependientes.</div></div>
           <div class="ci-count" id="ci-areas">&ndash;</div>
         </div>
         <div class="card-inicio" onclick="navegar('registro')">
-          <div class="ci-icon" style="background:#fce7f3">&#x270F;</div>
+          <div class="ci-icon" style="background:#fce7f3"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
           <div><div class="ci-title">Solicitudes</div><div class="ci-desc">Registr&#xE1; la creaci&#xF3;n o modificaci&#xF3;n de estructuras y descripciones de puestos.</div></div>
         </div>
       </div>
@@ -472,7 +527,7 @@ body {
           <select id="org-filtro-sec" onchange="renderizarOrganigrama()">
             <option value="">Todas las Secretar&#xED;as</option>
           </select>
-          <button class="header-btn" onclick="exportarOrg()" style="margin-left:auto">&#x2193; Exportar</button>
+          <button class="header-btn" onclick="exportarOrg()" style="margin-left:auto"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar</button>
         </div>
         <div class="org-area" id="org-area">
           <div class="loader-full"><div class="spinner"></div><p>Cargando organigrama&#x2026;</p></div>
@@ -488,12 +543,12 @@ body {
           <div class="ph-sub">Cat&#xE1;logo completo de cargos municipales con descriptivos</div>
         </div>
         <div style="display:flex;gap:10px">
-          <button class="header-btn" onclick="exportarNomenclador()">&#x2193; Exportar CSV</button>
+          <button class="header-btn" onclick="exportarNomenclador()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar CSV</button>
         </div>
       </div>
       <div class="nom-layout">
         <div class="filtros-panel">
-          <div class="filtros-title">&#x1F39A; Filtros</div>
+          <div class="filtros-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="2" y1="14" x2="6" y2="14"/><line x1="10" y1="8" x2="14" y2="8"/><line x1="18" y1="16" x2="22" y2="16"/></svg> Filtros</div>
           <div class="filtro-grupo">
             <span class="filtro-label">Nivel</span>
             <div class="filtro-opts" id="filtro-nivel">
@@ -574,7 +629,7 @@ body {
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:32px;box-shadow:var(--sh)">
         <div class="empty-state">
-          <div class="es-icon">&#x1F4C4;</div>
+          <div class="es-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></div>
           <div class="es-title">Documentaci&#xF3;n normativa</div>
           <div class="es-sub">Ac&#xE1; se vincular&#xE1;n las resoluciones, ordenanzas y reglamentos que dan marco a la estructura organizativa. Pr&#xF3;ximamente disponible.</div>
         </div>
@@ -608,7 +663,7 @@ body {
       </div>
       <div class="registro-vista">
         <div class="registro-topbar">
-          <span class="rt-icon">&#x270F;</span>
+          <span class="rt-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span>
           <div>
             <div class="rt-title">M&#xF3;dulo de Registro de Estructuras Municipales</div>
             <div class="rt-sub">Complet&#xE1; el formulario para registrar la solicitud. La Direcci&#xF3;n de RRHH recibir&#xE1; notificaci&#xF3;n para su revisi&#xF3;n.</div>
@@ -617,7 +672,7 @@ body {
         <iframe class="registro-iframe" id="iframe-registro" src="about:blank" title="M&#xF3;dulo de Registro de Estructuras" loading="lazy"></iframe>
         <div id="registro-placeholder" style="padding:48px;text-align:center">
           <div class="empty-state">
-            <div class="es-icon">&#x1F517;</div>
+            <div class="es-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
             <div class="es-title">M&#xF3;dulo de Registro</div>
             <div class="es-sub">Para activar este m&#xF3;dulo, peg&#xE1; la URL publicada de tu Google Apps Script de registro en la variable <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:11px">REGISTRO_URL</code> al comienzo del script de esta p&#xE1;gina.</div>
           </div>
@@ -643,6 +698,9 @@ body {
   </div>
 </div>
 
+<!-- Contenido solo para impresión / PDF -->
+<div id="detalle-print" class="solo-impresion"></div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -651,6 +709,15 @@ body {
 var DATOS_SERVIDOR = (function(){
   try { return JSON.parse('<?= datosInyectados ?>'); }
   catch(e){ return []; }
+})();
+
+// URL pública real de la app (la ventana sandbox de GAS no expone esta URL vía window.location)
+var APP_URL = '<?= appUrl ?>';
+var CARGO_INICIAL = (function(){
+  try { return JSON.parse('<?= cargoInicial ?>'); } catch(e){ return ''; }
+})();
+var TIPO_INICIAL = (function(){
+  try { return JSON.parse('<?= tipoInicial ?>'); } catch(e){ return ''; }
 })();
 
 // ============================================================
@@ -671,6 +738,7 @@ var ordenActual = 'nombre';
 var vistaActual = 'inicio';
 var puestoDetalle = null;
 var tabDetalle = 'descripcion';
+var orgExpandido = {};
 
 // ============================================================
 // INIT
@@ -680,9 +748,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('iframe-registro').src = REGISTRO_URL;
     document.getElementById('registro-placeholder').style.display = 'none';
   }
-  google.script.run.withSuccessHandler(function(src){
-    if (src) document.getElementById('sidebar-logo').src = src;
-  }).getLogo();
   cargarDatos();
 });
 
@@ -711,6 +776,13 @@ function inicializarUI() {
   renderizarAreas();
   renderizarCategorias();
   renderizarOrganigrama();
+  abrirDesdeUrl();
+}
+
+function abrirDesdeUrl() {
+  // CARGO_INICIAL viene del servidor (doGet lee ?cargo=&tipo= de la URL real),
+  // porque la app corre en un iframe sandbox cuya window.location no es la URL pública.
+  if (CARGO_INICIAL) abrirDetalle(CARGO_INICIAL, TIPO_INICIAL || undefined, true);
 }
 
 // ============================================================
@@ -835,9 +907,13 @@ function aplicarFiltroSec(el) {
   el.classList.add('sel'); filtroSec = el.dataset.val; renderizarNomenclador();
 }
 function aplicarOrden(val) { ordenActual = val; renderizarNomenclador(); }
-function buscarGlobal(val) { terminoBusqueda = val; renderizarNomenclador(); }
+function buscarGlobal(val) {
+  terminoBusqueda = val;
+  if (val && vistaActual !== 'nomenclador') navegar('nomenclador');
+  renderizarNomenclador();
+}
 
-var NIVEL_ICONS  = { 'Direcci\xF3n':'&#x1F3DB;','Departamento':'&#x1F5C2;','Divisi\xF3n':'&#x1F4C2;','Secci\xF3n':'&#x1F4C1;' };
+var NIVEL_ICONS  = { 'Direcci\xF3n':'<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg>','Departamento':'<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>','Divisi\xF3n':'<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>','Secci\xF3n':'<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' };
 var NIVEL_CLASS  = { 'Direcci\xF3n':'dir','Departamento':'dep','Divisi\xF3n':'div','Secci\xF3n':'sec' };
 var ORIENT_CLASS = { 'Administrativa':'adm','Operativa':'ope','T\xE9cnica':'tec','Inspecci\xF3n':'ins' };
 
@@ -848,7 +924,7 @@ function renderizarNomenclador() {
   setText('count-total', DATOS.length);
 
   if (filtrados.length === 0) {
-    lista.innerHTML = '<div class="empty-state"><div class="es-icon">&#x1F50D;</div><div class="es-title">Sin resultados</div><div class="es-sub">Prob\xE1 con otros filtros o t\xE9rminos de b\xFAsqueda.</div></div>';
+    lista.innerHTML = '<div class="empty-state"><div class="es-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="es-title">Sin resultados</div><div class="es-sub">Prob\xE1 con otros filtros o t\xE9rminos de b\xFAsqueda.</div></div>';
     return;
   }
 
@@ -864,7 +940,7 @@ function renderizarNomenclador() {
     var refArea = secNombre || d.secretaria || '';
     var esNoJer = d.tipoRegistro === 'nojerarquico';
     return '<div class="nom-card" onclick="abrirDetalle(\'' + esc(d.codigo) + '\', \'' + (d.tipoRegistro || 'jerarquico') + '\')" id="nc_' + esc(d.codigo) + '">' +
-      '<div class="nc-nivel ' + nc + '">' + (esNoJer ? '&#x1F464;' : (NIVEL_ICONS[d.nivel] || '&#x1F4CB;')) + '</div>' +
+      '<div class="nc-nivel ' + nc + '">' + (esNoJer ? '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' : (NIVEL_ICONS[d.nivel] || '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>')) + '</div>' +
       '<div class="nc-body">' +
         '<div class="nc-nombre">' + (d.nombreCargo || '') + '</div>' +
         '<div class="nc-meta">' +
@@ -873,12 +949,12 @@ function renderizarNomenclador() {
         '</div>' +
         '<div class="nc-tags">' +
           (esNoJer
-            ? '<span class="nc-tag" style="background:#fce7f3;color:#831843">&#x1F464; No jer\xE1rquico</span>'
+            ? '<span class="nc-tag" style="background:#fce7f3;color:#831843"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> No jer\xE1rquico</span>'
             : '<span class="nc-tag" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border)">' + (d.nivel || '') + '</span>'
           ) +
-          (d.tipoPuesto ? '<span class="nc-tag puesto">&#x1F4CB; ' + d.tipoPuesto + '</span>' : '') +
+          (d.tipoPuesto ? '<span class="nc-tag puesto"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg> ' + d.tipoPuesto + '</span>' : '') +
           '<span class="nc-tag ' + oc + '">' + (d.orientacion || '') + '</span>' +
-          (d.requiereTitulo === 'S\xED' ? '<span class="nc-tag" style="background:#fef3c7;color:#92400e">&#x1F393; T\xEDtulo</span>' : '') +
+          (d.requiereTitulo === 'S\xED' ? '<span class="nc-tag" style="background:#fef3c7;color:#92400e"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg> T\xEDtulo</span>' : '') +
         '</div>' +
       '</div>' +
       '<div class="nc-right"><span class="nc-arrow">&#x203A;</span></div>' +
@@ -889,13 +965,13 @@ function renderizarNomenclador() {
 // ============================================================
 // PANEL DE DETALLE — lógica nueva cargo + puesto genérico
 // ============================================================
-function abrirDetalle(codigo, tipoRegistro) {
+function abrirDetalle(codigo, tipoRegistro, sinUrl) {
   document.getElementById('detalle-header').innerHTML =
     '<div style="display:flex;align-items:center;gap:12px;padding:4px 0">' +
     '<div class="spinner" style="width:24px;height:24px;border-width:2px"></div>' +
     '<span style="font-size:13px;color:var(--text2)">Cargando ficha...</span>' +
     '</div>' +
-    '<button class="detalle-close" onclick="cerrarDetalle()">&#x2715;</button>';
+    '<button class="detalle-close" onclick="cerrarDetalle()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
   document.getElementById('detalle-body').innerHTML = '';
   document.getElementById('detalle-tabs').style.display = 'none';
   document.getElementById('detalle-overlay').classList.add('abierto');
@@ -911,7 +987,7 @@ function onDetalleLoaded(resp) {
   if (!resp || !resp.ok) {
     document.getElementById('detalle-header').innerHTML =
       '<span style="color:var(--red)">Error al cargar</span>' +
-      '<button class="detalle-close" onclick="cerrarDetalle()">&#x2715;</button>';
+      '<button class="detalle-close" onclick="cerrarDetalle()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
     return;
   }
   var d = resp.datos;
@@ -922,17 +998,19 @@ function onDetalleLoaded(resp) {
   var nc = NIVEL_CLASS[nivel] || 'dep';
 
   document.getElementById('detalle-header').innerHTML =
-    '<div class="dh-icono ' + nc + '">' + (NIVEL_ICONS[nivel] || '&#x1F4CB;') + '</div>' +
+    '<div class="dh-icono ' + nc + '">' + (NIVEL_ICONS[nivel] || '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>') + '</div>' +
     '<div class="dh-info">' +
       '<div class="dh-nivel">' + nivel +
         (d.tipoPuesto ? ' &mdash; <span style="color:var(--accent);font-weight:700">' + d.tipoPuesto + '</span>' : '') +
       '</div>' +
       '<div class="dh-nombre">' + (d.nombreCargo || '') + '</div>' +
       '<div class="dh-codigo">' + (d.codigo || '') +
-        '<button class="copy-btn" onclick="copiarCodigo(\'' + esc(d.codigo) + '\')" title="Copiar">&#x2398;</button>' +
+        '<button class="copy-btn" onclick="copiarCodigo(\'' + esc(d.codigo) + '\')" title="Copiar"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
+        '<button class="copy-btn" onclick="copiarEnlace(\'' + esc(d.codigo) + '\')" title="Copiar enlace para compartir"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>' +
+        '<button class="copy-btn" onclick="imprimirFicha()" title="Imprimir / Exportar PDF"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>' +
       '</div>' +
     '</div>' +
-    '<button class="detalle-close" onclick="cerrarDetalle()">&#x2715;</button>';
+    '<button class="detalle-close" onclick="cerrarDetalle()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
 
   document.getElementById('detalle-tabs').style.display = 'flex';
   document.querySelectorAll('.det-tab').forEach(function(t){ t.classList.remove('activo'); });
@@ -943,7 +1021,7 @@ function onDetalleLoaded(resp) {
 function onDetalleFail() {
   document.getElementById('detalle-header').innerHTML =
     '<span style="color:var(--red)">Error de conexi\xF3n</span>' +
-    '<button class="detalle-close" onclick="cerrarDetalle()">&#x2715;</button>';
+    '<button class="detalle-close" onclick="cerrarDetalle()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
 }
 
 function cerrarDetalle(e) {
@@ -972,7 +1050,7 @@ function renderizarTabDetalle(tab) {
     if (pg && pg.mision) {
       html +=
         '<div class="det-section">' +
-        '<div class="det-section-title">&#x1F4D6; Misi\xF3n del Puesto &mdash; ' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Misi\xF3n del Puesto &mdash; ' +
           '<span style="color:var(--accent)">' + pg.nombre + '</span>' +
         '</div>' +
         '<div class="det-mision" style="border-left:3px solid var(--accent);padding-left:16px;background:#eff6ff">' +
@@ -985,7 +1063,7 @@ function renderizarTabDetalle(tab) {
     if (d.misionEspecifica) {
       html +=
         '<div class="det-section">' +
-        '<div class="det-section-title">&#x1F4DD; Descripci\xF3n espec\xEDfica del cargo</div>' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> Descripci\xF3n espec\xEDfica del cargo</div>' +
         '<div class="det-mision">' + d.misionEspecifica + '</div>' +
         '</div>';
     }
@@ -997,7 +1075,7 @@ function renderizarTabDetalle(tab) {
     // Ubicación
     html +=
       '<div class="det-section">' +
-      '<div class="det-section-title">&#x1F4CD; Ubicaci\xF3n en la estructura</div>' +
+      '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Ubicaci\xF3n en la estructura</div>' +
       '<div class="det-info-grid">' +
         detInfoItem('Secretar\xEDa', d.secretaria ? (d.secretaria.split('\u2014')[1] || d.secretaria).trim() : '\u2014') +
         detInfoItem('Nivel', d.nivel || '\u2014') +
@@ -1014,7 +1092,7 @@ function renderizarTabDetalle(tab) {
     if (pg && pg.funciones) {
       html +=
         '<div class="det-section">' +
-        '<div class="det-section-title">&#x2699; Funciones del Puesto &mdash; ' + pg.nombre + '</div>' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Funciones del Puesto &mdash; ' + pg.nombre + '</div>' +
         '<div class="det-mision" style="font-size:12.5px;border-left:3px solid var(--accent);padding-left:16px;background:#eff6ff">' +
           pg.funciones +
         '</div>' +
@@ -1023,7 +1101,7 @@ function renderizarTabDetalle(tab) {
 
     html +=
       '<div class="det-section">' +
-      '<div class="det-section-title">&#x1F4CB; Datos del cargo</div>' +
+      '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Datos del cargo</div>' +
       '<div class="det-info-grid">' +
         detInfoItem('Tipo de Puesto', d.tipoPuesto || '\u2014') +
         detInfoItem('C\xF3digo Puesto', d.codigoPuesto || '\u2014', true) +
@@ -1035,7 +1113,7 @@ function renderizarTabDetalle(tab) {
     if (d.adicional1 || d.adicional2) {
       html +=
         '<div class="det-section">' +
-        '<div class="det-section-title">&#x1F4B0; Adicionales</div>' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Adicionales</div>' +
         '<div class="det-info-grid">' +
           (d.adicional1 ? detInfoItem('Adicional 1', d.adicional1) : '') +
           (d.adicional2 ? detInfoItem('Adicional 2', d.adicional2) : '') +
@@ -1048,19 +1126,19 @@ function renderizarTabDetalle(tab) {
   } else if (tab === 'requisitos') {
     var html =
       '<div class="det-section">' +
-      '<div class="det-section-title">&#x1F4CB; Requisitos del cargo</div>' +
+      '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Requisitos del cargo</div>' +
       '<div class="det-req-list">';
 
     if (pg && pg.requisitos) {
-      html += detReqItem('&#x1F4D6;', 'Requisitos del Puesto &mdash; ' + pg.nombre, true, pg.requisitos);
+      html += detReqItem('<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>', 'Requisitos del Puesto &mdash; ' + pg.nombre, true, pg.requisitos);
     }
 
     var tieneTitulo = d.requiereTitulo === 'S\xED' || d.requiereTitulo === 'Si' || d.requiereTitulo === 'true';
-    html += detReqItem('&#x1F393;', 'T\xEDtulo / Titulaci\xF3n excluyente', tieneTitulo,
+    html += detReqItem('<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg>', 'T\xEDtulo / Titulaci\xF3n excluyente', tieneTitulo,
       d.titulacion || (tieneTitulo ? 'Requerido' : 'No requerido'));
 
     var tieneMatricula = d.requiereMatricula === 'S\xED' || d.requiereMatricula === 'Si' || d.requiereMatricula === 'true';
-    html += detReqItem('&#x1F4CB;', 'Matr\xEDcula habilitante', tieneMatricula,
+    html += detReqItem('<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>', 'Matr\xEDcula habilitante', tieneMatricula,
       tieneMatricula ? 'Requerida' : 'No requerida');
 
     html += '</div></div>';
@@ -1068,7 +1146,7 @@ function renderizarTabDetalle(tab) {
     if (d.requisitosEspecificos) {
       html +=
         '<div class="det-section">' +
-        '<div class="det-section-title">&#x1F4C4; Requisitos espec\xEDficos del cargo</div>' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> Requisitos espec\xEDficos del cargo</div>' +
         '<div class="det-mision" style="font-size:12px;white-space:pre-wrap">' + d.requisitosEspecificos + '</div>' +
         '</div>';
     }
@@ -1078,26 +1156,26 @@ function renderizarTabDetalle(tab) {
   } else if (tab === 'contexto') {
     var html =
       '<div class="det-section">' +
-      '<div class="det-section-title">&#x1F517; Contexto de trabajo</div>' +
+      '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Contexto de trabajo</div>' +
       '<div class="det-mision">' + (d.contexto || 'Sin informaci\xF3n disponible.') + '</div>' +
       '</div>';
 
     if (d.secretaria) {
       html +=
         '<div class="det-section">' +
-        '<div class="det-section-title">&#x1F3DB; \xC1rea de pertenencia</div>' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg> \xC1rea de pertenencia</div>' +
         '<div class="det-mision" style="font-size:12.5px">' + d.secretaria + '</div>' +
         '</div>';
     }
 
     html +=
       '<div class="det-section" style="margin-top:20px">' +
-      '<div class="det-section-title">&#x270F; \xBFNeces\xEDt\xE1s modificar este cargo?</div>' +
+      '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg> \xBFNeces\xEDt\xE1s modificar este cargo?</div>' +
       '<button onclick="solicitarModificacion(\'' + esc(d.codigo) + '\')" style="' +
         'padding:11px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);' +
         'font-family:Segoe UI,sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;' +
         'box-shadow:0 3px 10px rgba(45,107,228,.3);display:inline-flex;align-items:center;gap:8px">' +
-        '&#x270F; Solicitar modificaci\xF3n de este cargo' +
+        '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg> Solicitar modificaci\xF3n de este cargo' +
       '</button>' +
       '</div>';
 
@@ -1119,7 +1197,7 @@ function detReqItem(icon, label, cumple, detalle) {
       '<div style="font-weight:600;color:var(--text)">' + label + '</div>' +
       '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + (detalle || '') + '</div>' +
     '</div>' +
-    '<span class="dr-check">' + (cumple ? '&#x2705;' : '&#x25CB;') + '</span>' +
+    '<span class="dr-check">' + (cumple ? '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' : '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>') + '</span>' +
     '</div>';
 }
 
@@ -1127,6 +1205,41 @@ function copiarCodigo(codigo) {
   navigator.clipboard.writeText(codigo).then(function(){
     mostrarToast('C\xF3digo ' + codigo + ' copiado', false);
   });
+}
+
+function copiarEnlace(codigo) {
+  // Se usa APP_URL (la URL pública real /exec, inyectada por el servidor) en vez de
+  // window.location, porque la app corre en un iframe sandbox de GAS cuya URL interna
+  // (googleusercontent.com) no es navegable ni compartible.
+  var url = new URL(APP_URL);
+  url.searchParams.set('cargo', codigo);
+  if (puestoDetalle && puestoDetalle.tipoRegistro) url.searchParams.set('tipo', puestoDetalle.tipoRegistro);
+  navigator.clipboard.writeText(url.toString()).then(function(){
+    mostrarToast('Enlace copiado al portapapeles', false);
+  });
+}
+
+function imprimirFicha() {
+  if (!puestoDetalle) return;
+  var savedTab = tabDetalle;
+  var body = document.getElementById('detalle-body');
+  var full = '';
+  ['descripcion', 'info', 'requisitos', 'contexto'].forEach(function(t){
+    renderizarTabDetalle(t);
+    full += body.innerHTML;
+  });
+  renderizarTabDetalle(savedTab);
+  document.querySelectorAll('.det-tab').forEach(function(t){ t.classList.remove('activo'); });
+  document.getElementById('tab-' + savedTab).classList.add('activo');
+
+  document.getElementById('detalle-print').innerHTML =
+    '<div class="print-header">' +
+      '<div class="print-nombre">' + (puestoDetalle.nombreCargo || '') + '</div>' +
+      '<div class="print-meta">' + (puestoDetalle.codigo || '') + ' &middot; ' + (puestoDetalle.nivel || '') +
+        (puestoDetalle.tipoPuesto ? ' &middot; ' + puestoDetalle.tipoPuesto : '') +
+      '</div>' +
+    '</div>' + full;
+  window.print();
 }
 
 function solicitarModificacion(codigo) {
@@ -1156,7 +1269,7 @@ function renderizarAreas() {
     var cod    = partes[0].trim();
     return '<div class="area-card" onclick="filtrarPorSecretaria(\'' + esc(k) + '\')">' +
       '<div class="area-card-header">' +
-        '<div class="area-icon" style="background:' + bg + '">&#x1F3DB;</div>' +
+        '<div class="area-icon" style="background:' + bg + '"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></div>' +
         '<div><div class="ar-titulo">' + nombre + '</div><div class="ar-codigo">' + cod + '</div></div>' +
       '</div>' +
       '<div class="area-card-body"><div class="area-stat-row">' +
@@ -1189,7 +1302,7 @@ function renderizarCategorias() {
     cat[o].push(d);
   });
   var COLORS = ['#dbeafe','#d1fae5','#ede9fe','#fff7ed','#fce7f3','#fef3c7'];
-  var ICONS  = ['&#x1F4C2;','&#x2699;','&#x1F52C;','&#x1F50E;','&#x1F4CB;','&#x1F3F7;'];
+  var ICONS  = ['<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.59a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>'];
   var keys = Object.keys(cat).sort();
   var cont = document.getElementById('categorias-content');
   cont.innerHTML = keys.map(function(o, idx){
@@ -1222,6 +1335,12 @@ function renderizarCategorias() {
 // ============================================================
 // ORGANIGRAMA
 // ============================================================
+function toggleOrgExpand(ev, codigo) {
+  ev.stopPropagation();
+  orgExpandido[codigo] = true;
+  renderizarOrganigrama();
+}
+
 function renderizarOrganigrama() {
   var area = document.getElementById('org-area');
   var filtroSecOrg = document.getElementById('org-filtro-sec').value;
@@ -1229,7 +1348,7 @@ function renderizarOrganigrama() {
     return d.nivel === 'Direcci\xF3n' && (!filtroSecOrg || d.secretaria === filtroSecOrg);
   });
   if (dirs.length === 0) {
-    area.innerHTML = '<div class="empty-state"><div class="es-icon">&#x1F310;</div><div class="es-title">Sin datos</div></div>';
+    area.innerHTML = '<div class="empty-state"><div class="es-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="es-title">Sin datos</div></div>';
     return;
   }
   var grupos = {};
@@ -1238,43 +1357,50 @@ function renderizarOrganigrama() {
     if (!grupos[s]) grupos[s] = [];
     grupos[s].push(d);
   });
-  var html = '<div style="display:flex;flex-direction:column;gap:32px;width:100%">';
+  var html = '<div style="display:flex;flex-direction:column;gap:40px;width:100%">';
   Object.keys(grupos).forEach(function(s){
     var partes = s.split('\u2014');
     var nombre = partes[1] ? partes[1].trim() : s;
     var cod    = partes[0].trim();
-    html += '<div>' +
-      '<div style="display:flex;justify-content:center;margin-bottom:12px">' +
+    html += '<div style="display:flex;flex-direction:column;align-items:center">' +
         '<div class="org-node secretaria" style="min-width:180px;max-width:220px">' +
-          '<span class="on-icono">&#x1F3DB;</span>' +
+          '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span>' +
           '<div class="on-nombre">' + nombre + '</div>' +
           '<div class="on-codigo">C\xF3d. \xC1REA ' + cod + '</div>' +
         '</div>' +
-      '</div>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">' +
+      '<div class="org-stem-down"></div>' +
+      '<div class="org-children">' +
         grupos[s].map(function(d){
           var subdeps = DATOS.filter(function(sub){
             return (sub.secretaria === d.secretaria)
               && (sub.nivel === 'Departamento' || sub.nivel === 'Divisi\xF3n')
               && String(sub.codigo).startsWith(String(d.codigo).substring(0, 10));
           });
-          return '<div style="display:flex;flex-direction:column;align-items:center">' +
-            '<div class="org-connector-v"></div>' +
+          return '<div class="org-child">' +
+            '<div class="org-stem-v"></div>' +
             '<div class="org-node direccion" onclick="abrirDetalle(\'' + esc(d.codigo) + '\')" title="' + (d.nombreCargo || '') + '">' +
-              '<span class="on-icono">&#x1F3E2;</span>' +
-              '<div class="on-nombre">' + (d.nombreCargo || '').replace('Direcci\xF3n de ', 'Dir. de ').substring(0, 32) + '</div>' +
+              '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/></svg></span>' +
+              '<div class="on-nombre">' + (d.nombreCargo || '').replace('Direcci\xF3n de ', 'Dir. de ').substring(0, 24) + '</div>' +
               '<div class="on-codigo">' + (d.codigo || '') + '</div>' +
             '</div>' +
             (subdeps.length > 0 ?
-              '<div class="org-connector-v"></div>' +
-              '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">' +
-                subdeps.slice(0, 4).map(function(sub){
-                  return '<div class="org-node jefatura" onclick="abrirDetalle(\'' + esc(sub.codigo) + '\')" style="min-width:100px;max-width:130px">' +
-                    '<div class="on-nombre" style="font-size:10px">' + (sub.nombreCargo || '').substring(0, 28) + '</div>' +
-                    '<div class="on-codigo">' + (sub.codigo || '') + '</div>' +
-                    '</div>';
+              '<div class="org-stem-down"></div>' +
+              '<div class="org-children">' +
+                (orgExpandido[d.codigo] ? subdeps : subdeps.slice(0, 4)).map(function(sub){
+                  return '<div class="org-child">' +
+                    '<div class="org-stem-v"></div>' +
+                    '<div class="org-node jefatura" onclick="abrirDetalle(\'' + esc(sub.codigo) + '\')" title="' + (sub.nombreCargo || '') + '" style="min-width:96px;max-width:124px">' +
+                      '<div class="on-nombre" style="font-size:10px">' + (sub.nombreCargo || '').substring(0, 22) + '</div>' +
+                      '<div class="on-codigo">' + (sub.codigo || '') + '</div>' +
+                    '</div>' +
+                  '</div>';
                 }).join('') +
-                (subdeps.length > 4 ? '<div class="org-node jefatura" style="font-size:10px;color:var(--text3)">+' + (subdeps.length - 4) + ' m\xE1s</div>' : '') +
+                (!orgExpandido[d.codigo] && subdeps.length > 4 ?
+                  '<div class="org-child">' +
+                    '<div class="org-stem-v"></div>' +
+                    '<div class="org-node jefatura" onclick="toggleOrgExpand(event,\'' + esc(d.codigo) + '\')" style="font-size:10px;color:var(--accent);font-weight:700">+' + (subdeps.length - 4) + ' m\xE1s</div>' +
+                  '</div>'
+                : '') +
               '</div>'
             : '') +
             '</div>';
@@ -1309,7 +1435,7 @@ function exportarNomenclador() {
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url; a.download = 'nomenclador-mscb.csv'; a.click();
-  mostrarToast('CSV exportado &#x2705;', false);
+  mostrarToast('CSV exportado <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>', false);
 }
 
 function exportarOrg() { mostrarToast('Pr\xF3ximamente: exportar organigrama como PDF', false); }
