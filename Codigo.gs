@@ -321,7 +321,7 @@ function crearMapaDependencias() {
   var valNoJer  = hojaNoJer.getDataRange().getValues().slice(FILA_DATA_INICIO - 1);
   var depSet = {};
   valNoJer.forEach(function(f) {
-    var dep = String(f[8] || '').trim();
+    var dep = String(f[9] || '').trim();
     if (dep) depSet[dep] = true;
   });
   var depList = Object.keys(depSet).sort();
