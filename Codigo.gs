@@ -386,6 +386,126 @@ function getMapaDependencias() {
 
 
 // ============================================================
+// poblarCompetencias
+// Escribe las competencias ONEP en BD_Nomenclador y BD_Puestos_NoJerarquicos
+// según el tipo de puesto. Solo sobreescribe filas que estén vacías en
+// esas columnas (para no pisar datos manuales ya cargados).
+// Ejecutar manualmente desde el editor de Apps Script.
+// ============================================================
+
+function poblarCompetencias() {
+  var COMP = {
+    jerarquico: {
+      principales: [
+        'Liderazgo efectivo',
+        'Planificación y gestión de resultados',
+        'Resolución de conflictos y negociación',
+        'Toma de decisiones',
+        'Orientación y compromiso con el servicio público'
+      ].join('\n'),
+      secundarias: [
+        'Desarrollo de las personas',
+        'Visión estratégica'
+      ].join('\n')
+    },
+    operativo: {
+      principales: [
+        'Orientación y compromiso con el servicio público',
+        'Integridad y ética institucional',
+        'Dominio de la tarea',
+        'Trabajo en equipo y colaboración',
+        'Organización del trabajo'
+      ].join('\n'),
+      secundarias: [
+        'Comunicación y empatía',
+        'Manejo emocional'
+      ].join('\n')
+    },
+    administrativo: {
+      principales: [
+        'Orientación y compromiso con el servicio público',
+        'Dominio de la tarea',
+        'Uso de tecnologías de la información y la comunicación',
+        'Organización del trabajo',
+        'Comunicación y empatía'
+      ].join('\n'),
+      secundarias: [
+        'Integridad y ética institucional',
+        'Trabajo en equipo y colaboración'
+      ].join('\n')
+    },
+    tecnico: {
+      principales: [
+        'Dominio de la tarea',
+        'Pensamiento crítico',
+        'Uso de tecnologías de la información y la comunicación',
+        'Orientación y compromiso con el servicio público',
+        'Organización del trabajo'
+      ].join('\n'),
+      secundarias: [
+        'Aprendizaje continuo',
+        'Iniciativa y creatividad'
+      ].join('\n')
+    },
+    profesional: {
+      principales: [
+        'Dominio de la tarea',
+        'Pensamiento crítico',
+        'Iniciativa y creatividad',
+        'Aprendizaje continuo',
+        'Orientación y compromiso con el servicio público'
+      ].join('\n'),
+      secundarias: [
+        'Comunicación y empatía',
+        'Trabajo en equipo y colaboración'
+      ].join('\n')
+    }
+  };
+
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID_NOMENCLADOR);
+  var updJer = 0, updNoJer = 0;
+
+  // ── Jerárquicos: cols O(15) y P(16) ──
+  var hojaJer = ss.getSheetByName(HOJA_BD_NOM);
+  var valsJer = hojaJer.getDataRange().getValues();
+  for (var i = FILA_DATA_INICIO - 1; i < valsJer.length; i++) {
+    var codigo = String(valsJer[i][0] || '').trim();
+    var nivel  = String(valsJer[i][1] || '').trim();
+    if (!codigo || NIVELES_EXCLUIR.indexOf(nivel) !== -1) continue;
+    var yaP = String(valsJer[i][14] || '').trim();
+    var yaS = String(valsJer[i][15] || '').trim();
+    if (yaP || yaS) continue; // no pisar datos manuales
+    hojaJer.getRange(i + 1, 15).setValue(COMP.jerarquico.principales);
+    hojaJer.getRange(i + 1, 16).setValue(COMP.jerarquico.secundarias);
+    updJer++;
+  }
+
+  // ── No jerárquicos: cols L(12) y M(13) ──
+  var hojaNoJer = ss.getSheetByName(HOJA_NO_JER);
+  var valsNoJer = hojaNoJer.getDataRange().getValues();
+  for (var j = FILA_DATA_INICIO - 1; j < valsNoJer.length; j++) {
+    var cod2  = String(valsNoJer[j][0] || '').trim();
+    var tipo  = String(valsNoJer[j][2] || '').trim().toLowerCase();
+    if (!cod2) continue;
+    var yaP2 = String(valsNoJer[j][11] || '').trim();
+    var yaS2 = String(valsNoJer[j][12] || '').trim();
+    if (yaP2 || yaS2) continue;
+    var key = tipo.indexOf('operativ') !== -1 ? 'operativo'
+            : tipo.indexOf('administrativ') !== -1 ? 'administrativo'
+            : tipo.indexOf('profesional') !== -1 ? 'profesional'
+            : 'tecnico'; // técnico como fallback
+    hojaNoJer.getRange(j + 1, 12).setValue(COMP[key].principales);
+    hojaNoJer.getRange(j + 1, 13).setValue(COMP[key].secundarias);
+    updNoJer++;
+  }
+
+  SpreadsheetApp.flush();
+  Logger.log('Jerárquicos actualizados: ' + updJer + ' | No jerárquicos: ' + updNoJer);
+  return 'Jerárquicos: ' + updJer + ' | No jerárquicos: ' + updNoJer;
+}
+
+
+// ============================================================
 // getLogo — sin cambios
 // ============================================================
 
