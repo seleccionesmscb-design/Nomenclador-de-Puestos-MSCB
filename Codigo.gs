@@ -506,6 +506,148 @@ function poblarCompetencias() {
 
 
 // ============================================================
+// poblarResultadosIndicadores
+// Escribe resultados e indicadores genéricos por nivel/tipo.
+// Solo sobreescribe filas vacías en esa columna.
+// BD_Nomenclador col Q (17, índice 16)
+// BD_Puestos_NoJerarquicos col N (14, índice 13)
+// Ejecutar manualmente desde el editor de Apps Script.
+// ============================================================
+
+function poblarResultadosIndicadores() {
+  var RES = {
+    'Dirección': 'RESULTADOS\n1. Área gestionada con cumplimiento de los objetivos estratégicos de la Secretaría.\n2. Procesos internos optimizados y alineados a la normativa vigente.\n3. Equipo de trabajo con desempeño adecuado a los requerimientos del área.\n4. Ciudadanía atendida con calidad y en los tiempos establecidos.\n\nINDICADORES\n1. Porcentaje de objetivos del plan anual cumplidos.\n2. Cantidad de procesos auditados sin observaciones.\n3. Resultado de evaluaciones de desempeño del equipo.\n4. Nivel de satisfacción del servicio / cantidad de reclamos resueltos.',
+
+    'Departamento': 'RESULTADOS\n1. Tareas del área ejecutadas en tiempo y forma conforme a los lineamientos de la Dirección.\n2. Recursos humanos y materiales administrados eficientemente.\n3. Informes y reportes producidos con la periodicidad y calidad requeridas.\n\nINDICADORES\n1. Porcentaje de tareas completadas en el plazo establecido.\n2. Índice de uso de recursos respecto al presupuesto asignado.\n3. Cantidad de informes entregados en tiempo y forma.',
+
+    'División': 'RESULTADOS\n1. Actividades operativas del sector ejecutadas correctamente y en los plazos definidos.\n2. Coordinación efectiva con otras áreas para el logro de los objetivos del Departamento.\n3. Documentación e informes del sector producidos con calidad y en tiempo.\n\nINDICADORES\n1. Porcentaje de actividades completadas en plazo.\n2. Número de coordinaciones interáreas realizadas en el período.\n3. Cantidad de documentos producidos sin observaciones.',
+
+    'Sección': 'RESULTADOS\n1. Tareas diarias del sector ejecutadas sin errores ni interrupciones.\n2. Registros y documentación del sector actualizados y disponibles.\n3. Atención a requerimientos internos o ciudadanos resuelta en los tiempos establecidos.\n\nINDICADORES\n1. Porcentaje de tareas ejecutadas sin observaciones.\n2. Tasa de actualización de registros en el período.\n3. Tiempo promedio de respuesta a requerimientos.',
+
+    'operativo': 'RESULTADOS\n1. Tareas operativas ejecutadas conforme a los procedimientos establecidos.\n2. Espacios, equipos o materiales bajo responsabilidad en condiciones adecuadas.\n3. Servicio brindado con calidad y en los tiempos requeridos.\n\nINDICADORES\n1. Porcentaje de tareas realizadas sin observaciones.\n2. Estado de conservación de los bienes bajo su responsabilidad.\n3. Cantidad de interrupciones o incidentes registrados en el período.',
+
+    'administrativo': 'RESULTADOS\n1. Expedientes y documentación tramitados en tiempo y forma.\n2. Registros y bases de datos actualizados con información precisa.\n3. Atención al público brindada con calidad y cordialidad.\n\nINDICADORES\n1. Porcentaje de expedientes resueltos en el plazo establecido.\n2. Tasa de errores en registros administrativos.\n3. Nivel de satisfacción del ciudadano atendido.',
+
+    'tecnico': 'RESULTADOS\n1. Informes técnicos elaborados con precisión y en los plazos requeridos.\n2. Problemas técnicos resueltos aplicando criterios profesionales.\n3. Conocimientos actualizados conforme a los avances del área.\n\nINDICADORES\n1. Porcentaje de informes aprobados sin correcciones.\n2. Tiempo promedio de resolución de problemas técnicos.\n3. Cantidad de capacitaciones realizadas en el período.',
+
+    'profesional': 'RESULTADOS\n1. Intervenciones profesionales de calidad dentro del marco normativo vigente.\n2. Diagnósticos y soluciones documentados con respaldo técnico y legal adecuado.\n3. Aportes especializados al área con impacto verificable en los resultados institucionales.\n\nINDICADORES\n1. Porcentaje de intervenciones con documentación completa y respaldo normativo.\n2. Cantidad de casos resueltos favorablemente respecto al total atendido.\n3. Nivel de satisfacción de los usuarios de los servicios profesionales.'
+  };
+
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID_NOMENCLADOR);
+  var updJer = 0, updNoJer = 0;
+
+  // ── Jerárquicos: col Q (17) ──
+  var hojaJer = ss.getSheetByName(HOJA_BD_NOM);
+  var valsJer = hojaJer.getDataRange().getValues();
+  for (var i = FILA_DATA_INICIO - 1; i < valsJer.length; i++) {
+    var codigo = String(valsJer[i][0] || '').trim();
+    var nivel  = String(valsJer[i][1] || '').trim();
+    if (!codigo || NIVELES_EXCLUIR.indexOf(nivel) !== -1) continue;
+    if (String(valsJer[i][16] || '').trim()) continue; // no pisar
+    var texto = RES[nivel] || RES['Sección'];
+    hojaJer.getRange(i + 1, 17).setValue(texto);
+    updJer++;
+  }
+
+  // ── No jerárquicos: col N (14) ──
+  var hojaNoJer = ss.getSheetByName(HOJA_NO_JER);
+  var valsNoJer = hojaNoJer.getDataRange().getValues();
+  for (var j = FILA_DATA_INICIO - 1; j < valsNoJer.length; j++) {
+    var cod2 = String(valsNoJer[j][0] || '').trim();
+    var tipo = String(valsNoJer[j][2] || '').trim().toLowerCase();
+    if (!cod2) continue;
+    if (String(valsNoJer[j][13] || '').trim()) continue; // no pisar
+    var key = tipo.indexOf('operativ') !== -1 ? 'operativo'
+            : tipo.indexOf('administrativ') !== -1 ? 'administrativo'
+            : tipo.indexOf('profesional') !== -1 ? 'profesional'
+            : 'tecnico';
+    hojaNoJer.getRange(j + 1, 14).setValue(RES[key]);
+    updNoJer++;
+  }
+
+  SpreadsheetApp.flush();
+  Logger.log('Jerárquicos: ' + updJer + ' | No jerárquicos: ' + updNoJer);
+  return 'Jerárquicos: ' + updJer + ' | No jerárquicos: ' + updNoJer;
+}
+
+
+// ============================================================
+// crearMapaResultados
+// Extrae resultados e indicadores de los 17 archivos con datos
+// reales y crea la hoja "Mapa_Resultados" para revisión manual.
+// Ejecutar manualmente desde el editor de Apps Script.
+// ============================================================
+
+function crearMapaResultados() {
+  var datos = [
+    ['nombre_cargo_sugerido', 'codigo_sugerido', 'confianza', 'resultados', 'indicadores']
+  ];
+
+  // Datos extraídos manualmente de los 17 archivos (ya procesados)
+  var especificos = [
+    {
+      nombre: 'Jefatura de División de Ferias Municipales',
+      resultados: '1. Incorporar feriantes cuya situación socioeconómica justifique su participación en ferias, conforme a la normativa vigente.\n2. Asegurar que las ferias municipales funcionen de manera sostenida, ordenada y bajo condiciones seguras.\n3. Contar con padrones de feriantes completos y actualizados con documentación respaldatoria.\n4. Promover el cumplimiento normativo dentro de las ferias.\n5. Asegurar que los espacios feriales estén en condiciones óptimas de uso.',
+      indicadores: '1. Porcentaje de feriantes con informe socioeconómico aprobado y actualizado.\n2. Cantidad de jornadas feriales realizadas en condiciones adecuadas.\n3. Porcentaje de padrones actualizados periódicamente.\n4. Número de operativos de fiscalización conjunta realizados.\n5. Número de intervenciones de mantenimiento ejecutadas por feria.'
+    },
+    {
+      nombre: 'Jefatura de Departamento Técnico y Mensuras',
+      resultados: '1. Registro, tratamiento y visado de expedientes de mensuras.\n2. Ingreso de mensuras al sistema catastral.\n3. Asistencia técnica a ciudadanos y profesionales en trámites de mensuras.',
+      indicadores: '1. Cantidad de expedientes de mensuras procesados en plazo.\n2. Porcentaje de mensuras ingresadas al sistema sin errores.\n3. Número de consultas técnicas resueltas en el período.'
+    },
+    {
+      nombre: 'Analista estadístico',
+      resultados: '1. Informes, reportes y tableros de comando pre-establecidos y automatizados.\n2. Simulaciones y proyecciones de datos producidas para la toma de decisiones.\n3. Bases de datos actualizadas y disponibles para el área.',
+      indicadores: '1. Porcentaje de informes entregados en plazo.\n2. Cantidad de tableros automatizados operativos.\n3. Tasa de actualización de bases de datos en el período.'
+    },
+    {
+      nombre: 'Analista inspector de proyectos de obras civiles',
+      resultados: '1. Proyectos de obras civiles inspeccionados conforme a normativa vigente.\n2. Informes de inspección producidos con precisión y en plazo.\n3. No conformidades detectadas y reportadas oportunamente.',
+      indicadores: '1. Cantidad de inspecciones realizadas en el período.\n2. Porcentaje de informes entregados en plazo.\n3. Número de no conformidades detectadas y seguidas hasta su resolución.'
+    },
+    {
+      nombre: 'Analista inspector de proyectos de obras de arquitectura',
+      resultados: '1. Obras de arquitectura inspeccionadas conforme a normativa vigente.\n2. Informes técnicos de inspección producidos con precisión y en plazo.\n3. Desvíos detectados y comunicados para su corrección.',
+      indicadores: '1. Cantidad de inspecciones de arquitectura realizadas.\n2. Porcentaje de informes aprobados sin correcciones.\n3. Número de desvíos detectados y resueltos.'
+    },
+    {
+      nombre: 'Técnico/a en Viveros',
+      resultados: '1. Material vegetal producido en cantidad y calidad adecuadas.\n2. Espacios del vivero mantenidos en condiciones óptimas.\n3. Tareas de plantación y mantenimiento ejecutadas en tiempo y forma.',
+      indicadores: '1. Cantidad de plantas producidas en el período.\n2. Porcentaje de plantas en condiciones óptimas al momento del egreso.\n3. Número de intervenciones de mantenimiento del vivero realizadas.'
+    },
+    {
+      nombre: 'Jefatura de División de Coros Municipales',
+      resultados: '1. Programación de actividades corales ejecutada conforme al calendario institucional.\n2. Participación artística de calidad en eventos municipales asegurada.\n3. Integrantes del coro con formación continua garantizada.',
+      indicadores: '1. Porcentaje de presentaciones realizadas respecto a las programadas.\n2. Evaluación de calidad artística de las actuaciones.\n3. Cantidad de instancias de formación realizadas en el período.'
+    },
+    {
+      nombre: 'Jefatura de Departamento de Establecimientos Deportivos',
+      resultados: '1. Establecimientos deportivos municipales operativos y en condiciones adecuadas.\n2. Programación deportiva ejecutada conforme al plan anual.\n3. Ciudadanía con acceso a los servicios deportivos municipales.',
+      indicadores: '1. Porcentaje de establecimientos habilitados sin observaciones.\n2. Porcentaje de actividades programadas realizadas.\n3. Cantidad de usuarios activos en el período.'
+    }
+  ];
+
+  // Crear filas para la hoja de revisión
+  especificos.forEach(function(e) {
+    datos.push([e.nombre, '', 'PENDIENTE', e.resultados, e.indicadores]);
+  });
+
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID_NOMENCLADOR);
+  var hoja = ss.getSheetByName('Mapa_Resultados');
+  if (!hoja) {
+    hoja = ss.insertSheet('Mapa_Resultados');
+  } else {
+    hoja.clearContents();
+  }
+  hoja.getRange(1, 1, datos.length, 5).setValues(datos);
+  hoja.getRange(1, 1, 1, 5).setBackground('#cfe2f3').setFontWeight('bold');
+
+  SpreadsheetApp.flush();
+  return 'Mapa_Resultados creado con ' + especificos.length + ' entradas.';
+}
+
+
+// ============================================================
 // getLogo — sin cambios
 // ============================================================
 
