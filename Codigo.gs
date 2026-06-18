@@ -109,7 +109,10 @@ function getDatosCombinados() {
           misionEspecifica:  String(f[9] || '').trim(),
           requiereTitulo:    String(f[3] || '').trim() !== '' ? 'Sí' : 'No',
           requiereMatricula: 'No',
-          normativa:         ''
+          normativa:         '',
+          categoria:         String(f[4] || '').trim(),
+          adicional1:        String(f[6] || '').trim(),
+          adicional2:        String(f[7] || '').trim()
         };
       });
 
@@ -167,10 +170,14 @@ function getDetallePuesto(codigo, tipoRegistro) {
         requiereMatricula:     'No',
         categoria:             String(filaCargo[4] || '').trim(),
         contexto:              String(filaCargo[5] || '').trim(),
-        adicional1:            String(filaCargo[6] || '').trim(),
-        adicional2:            String(filaCargo[7] || '').trim(),
-        normativa:             '',
-        puestoGenerico:        null
+        adicional1:              String(filaCargo[6]  || '').trim(),
+        adicional2:              String(filaCargo[7]  || '').trim(),
+        normativa:               '',
+        competenciasPrincipales: String(filaCargo[10] || '').trim(),
+        competenciasSecundarias: String(filaCargo[11] || '').trim(),
+        resultadosIndicadores:   String(filaCargo[12] || '').trim(),
+        responsabilidades:       String(filaCargo[13] || '').trim(),
+        puestoGenerico:          null
       };
 
     } else {
@@ -206,10 +213,14 @@ function getDetallePuesto(codigo, tipoRegistro) {
         requiereMatricula:     String(filaCargo[12] || '').trim(),
         categoria:             '',
         contexto:              '',
-        adicional1:            '',
-        adicional2:            '',
-        normativa:             String(filaCargo[13] || '').trim(),
-        puestoGenerico:        null
+        adicional1:              '',
+        adicional2:              '',
+        normativa:               String(filaCargo[13] || '').trim(),
+        competenciasPrincipales: String(filaCargo[14] || '').trim(),
+        competenciasSecundarias: String(filaCargo[15] || '').trim(),
+        resultadosIndicadores:   String(filaCargo[16] || '').trim(),
+        responsabilidades:       String(filaCargo[17] || '').trim(),
+        puestoGenerico:          null
       };
     }
 
