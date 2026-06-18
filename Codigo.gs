@@ -29,6 +29,11 @@ function doGet(e) {
     template.datosInyectados = '[]';
   }
   template.appUrl = ScriptApp.getService().getUrl();
+  try {
+    template.mapaDependenciasInyectado = JSON.stringify(getMapaDependencias());
+  } catch (err) {
+    template.mapaDependenciasInyectado = '{}';
+  }
   var cargoInicial = (e && e.parameter && e.parameter.cargo) ? String(e.parameter.cargo) : '';
   var tipoInicial  = (e && e.parameter && e.parameter.tipo)  ? String(e.parameter.tipo)  : '';
   template.cargoInicial = JSON.stringify(cargoInicial);
@@ -266,6 +271,117 @@ function orientacionDesdeTipo_(tipo) {
   if (t.indexOf('administrativ') !== -1) return 'Administrativa';
   if (t.indexOf('profesional') !== -1) return 'Técnica';
   return '';
+}
+
+
+// ============================================================
+// HELPERS para coincidencia difusa de dependencias
+// ============================================================
+
+function normalizar_(s) {
+  return (s || '').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function tokenScore_(a, b) {
+  var ta = normalizar_(a).split(' ').filter(function(w){ return w.length > 2; });
+  var tb = normalizar_(b).split(' ').filter(function(w){ return w.length > 2; });
+  if (ta.length === 0 || tb.length === 0) return 0;
+  var match = 0;
+  ta.forEach(function(w) { if (tb.indexOf(w) !== -1) match++; });
+  return match / Math.max(ta.length, tb.length);
+}
+
+
+// ============================================================
+// crearMapaDependencias
+// Lee la columna "dependencia directa" de BD_Puestos_NoJerarquicos,
+// hace fuzzy-match con los nombres de BD_Nomenclador,
+// y crea/sobreescribe la hoja "Mapa_Dependencias" con el resultado.
+// Ejecutar manualmente desde el editor de Apps Script.
+// ============================================================
+
+function crearMapaDependencias() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID_NOMENCLADOR);
+
+  // Leer nombres del nomenclador jerárquico
+  var hojaJer = ss.getSheetByName(HOJA_BD_NOM);
+  var valJer   = hojaJer.getDataRange().getValues().slice(FILA_DATA_INICIO - 1);
+  var candidatos = valJer
+    .filter(function(f) { return String(f[0] || '').trim() !== ''; })
+    .map(function(f) {
+      return { codigo: String(f[0]).trim(), nombre: String(f[2]).trim() };
+    });
+
+  // Leer dependencias únicas de no jerárquicos (columna 8)
+  var hojaNoJer = ss.getSheetByName(HOJA_NO_JER);
+  var valNoJer  = hojaNoJer.getDataRange().getValues().slice(FILA_DATA_INICIO - 1);
+  var depSet = {};
+  valNoJer.forEach(function(f) {
+    var dep = String(f[8] || '').trim();
+    if (dep) depSet[dep] = true;
+  });
+  var depList = Object.keys(depSet).sort();
+
+  // Para cada dependencia, buscar el mejor candidato
+  var filas = [['dependencia_texto', 'codigo_sugerido', 'nombre_sugerido', 'confianza']];
+  depList.forEach(function(dep) {
+    var mejorScore = -1;
+    var mejor = null;
+    candidatos.forEach(function(c) {
+      var score = tokenScore_(dep, c.nombre);
+      if (score > mejorScore) { mejorScore = score; mejor = c; }
+    });
+    var conf = mejorScore >= 0.7 ? 'ALTA' : mejorScore >= 0.4 ? 'MEDIA' : 'BAJA';
+    filas.push([dep, mejor ? mejor.codigo : '', mejor ? mejor.nombre : '', conf]);
+  });
+
+  // Crear o sobreescribir hoja
+  var hojaMapa = ss.getSheetByName('Mapa_Dependencias');
+  if (!hojaMapa) {
+    hojaMapa = ss.insertSheet('Mapa_Dependencias');
+  } else {
+    hojaMapa.clearContents();
+  }
+  hojaMapa.getRange(1, 1, filas.length, 4).setValues(filas);
+
+  // Colorear por confianza
+  for (var i = 1; i < filas.length; i++) {
+    var conf = filas[i][3];
+    var color = conf === 'ALTA' ? '#d4edda' : conf === 'MEDIA' ? '#fff3cd' : '#f8d7da';
+    hojaMapa.getRange(i + 1, 1, 1, 4).setBackground(color);
+  }
+
+  SpreadsheetApp.flush();
+  return 'Mapa_Dependencias creado con ' + depList.length + ' filas.';
+}
+
+
+// ============================================================
+// getMapaDependencias
+// Lee "Mapa_Dependencias" y devuelve un objeto { dep_text: codigo }.
+// Solo incluye filas donde codigo_sugerido no está vacío.
+// ============================================================
+
+function getMapaDependencias() {
+  try {
+    var ss    = SpreadsheetApp.openById(SPREADSHEET_ID_NOMENCLADOR);
+    var hoja  = ss.getSheetByName('Mapa_Dependencias');
+    if (!hoja) return {};
+    var vals  = hoja.getDataRange().getValues();
+    var mapa  = {};
+    for (var i = 1; i < vals.length; i++) {
+      var dep    = String(vals[i][0] || '').trim();
+      var codigo = String(vals[i][1] || '').trim();
+      if (dep && codigo) mapa[dep] = codigo;
+    }
+    return mapa;
+  } catch (e) {
+    return {};
+  }
 }
 
 
