@@ -1584,7 +1584,7 @@ function verEnOrganigrama() {
 
   // No jerárquicos: navegar al nodo del que dependen
   if (d.tipoRegistro === 'nojerarquico') {
-    var dep = d.secretaria || '';
+    var dep = d.dependencia || d.secretaria || '';
     var codigoPadre = MAPA_DEPENDENCIAS[dep] || '';
     if (!codigoPadre) {
       mostrarToast('No se encontró la dependencia de este puesto en el organigrama', true);
