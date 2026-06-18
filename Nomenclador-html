@@ -1186,7 +1186,9 @@ function renderizarTabDetalle(tab) {
           'Ver en organigrama</button>' +
       '</div>' +
       '<div class="det-info-grid">' +
-        detInfoItem('Secretar\xEDa', d.secretaria ? (d.secretaria.split('\u2014')[1] || d.secretaria).trim() : '\u2014') +
+        (d.tipoRegistro === 'nojerarquico'
+          ? detInfoItem('Dependencia', d.dependencia || '\u2014')
+          : detInfoItem('Secretar\xEDa', d.secretaria ? (d.secretaria.split('\u2014')[1] || d.secretaria).trim() : '\u2014')) +
         detInfoItem('Nivel', d.nivel || '\u2014') +
         detInfoItem('C\xF3digo', d.codigo, true) +
         detInfoItem('Orientaci\xF3n', d.orientacion || '\u2014') +
