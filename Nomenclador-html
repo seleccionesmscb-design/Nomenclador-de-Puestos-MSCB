@@ -435,22 +435,28 @@ body {
       <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Organigrama</span>
     </div>
     <div class="nav-item" onclick="navegar('nomenclador')" id="nav-nomenclador">
-      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span><span>Nomenclador</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span><span>Puestos</span>
       <span class="nav-badge" id="badge-total">&ndash;</span>
     </div>
     <div class="nav-section-label">Explorar</div>
     <div class="nav-item" onclick="navegar('areas')" id="nav-areas">
-      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span><span>&#xC1;reas / Secretar&#xED;as</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span><span>Puestos por &#xE1;rea</span>
     </div>
     <div class="nav-item" onclick="navegar('categorias')" id="nav-categorias">
-      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.59a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span>Categor&#xED;as</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.59a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span>Agrupamientos</span>
+    </div>
+    <div class="nav-item" onclick="navegar('adicionales')" id="nav-adicionales">
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Adicionales por puesto</span>
+    </div>
+    <div class="nav-item" onclick="navegar('catescalafon')" id="nav-catescalafon">
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span><span>Categor&#xED;as</span>
     </div>
     <div class="nav-item" onclick="navegar('documentacion')" id="nav-documentacion">
       <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span>Documentaci&#xF3;n</span>
     </div>
     <div class="nav-section-label">Informaci&#xF3;n</div>
     <div class="nav-item" onclick="navegar('info')" id="nav-info">
-      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span>Informaci&#xF3;n adicional</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span>Gu&#xED;a de uso</span>
     </div>
   </nav>
   <div class="sidebar-cta">
@@ -507,12 +513,12 @@ body {
         </div>
         <div class="card-inicio" onclick="navegar('nomenclador')">
           <div class="ci-icon" style="background:#ede9fe"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
-          <div><div class="ci-title">Nomenclador</div><div class="ci-desc">Explor&#xE1; todos los cargos con sus funciones y requisitos.</div></div>
+          <div><div class="ci-title">Puestos</div><div class="ci-desc">Explor&#xE1; todos los cargos con sus funciones y requisitos.</div></div>
           <div class="ci-count" id="ci-puestos">&ndash;</div>
         </div>
         <div class="card-inicio" onclick="navegar('areas')">
           <div class="ci-icon" style="background:#d1fae5"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></div>
-          <div><div class="ci-title">&#xC1;reas</div><div class="ci-desc">Explor&#xE1; las secretar&#xED;as y sus estructuras dependientes.</div></div>
+          <div><div class="ci-title">Puestos por &#xE1;rea</div><div class="ci-desc">Explor&#xE1; las secretar&#xED;as y sus estructuras dependientes.</div></div>
           <div class="ci-count" id="ci-areas">&ndash;</div>
         </div>
         <div class="card-inicio" onclick="navegar('registro')">
@@ -607,8 +613,8 @@ body {
     <section class="vista" id="vista-areas">
       <div class="page-header">
         <div class="page-header-left">
-          <div class="ph-title">&#xC1;reas y Secretar&#xED;as</div>
-          <div class="ph-sub">Estructura de secretar&#xED;as y sus dependencias</div>
+          <div class="ph-title">Puestos por &#xE1;rea</div>
+          <div class="ph-sub">Cargos agrupados por secretar&#xED;a y dependencia</div>
         </div>
       </div>
       <div class="areas-grid" id="areas-grid">
@@ -616,15 +622,37 @@ body {
       </div>
     </section>
 
-    <!-- CATEGORÍAS -->
+    <!-- AGRUPAMIENTOS -->
     <section class="vista" id="vista-categorias">
       <div class="page-header">
         <div class="page-header-left">
-          <div class="ph-title">Categor&#xED;as de Puestos</div>
-          <div class="ph-sub">Clasificaci&#xF3;n seg&#xFA;n orientaci&#xF3;n y nivel jer&#xE1;rquico</div>
+          <div class="ph-title">Agrupamientos de Puestos</div>
+          <div class="ph-sub">Clasificaci&#xF3;n seg&#xFA;n tipo de puesto y orientaci&#xF3;n</div>
         </div>
       </div>
       <div id="categorias-content"></div>
+    </section>
+
+    <!-- ADICIONALES POR PUESTO -->
+    <section class="vista" id="vista-adicionales">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="ph-title">Adicionales por puesto</div>
+          <div class="ph-sub">Adicionales vigentes y los puestos que los perciben</div>
+        </div>
+      </div>
+      <div id="adicionales-content"></div>
+    </section>
+
+    <!-- CATEGORÍAS ESCALAFÓN -->
+    <section class="vista" id="vista-catescalafon">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="ph-title">Categor&#xED;as</div>
+          <div class="ph-sub">Categor&#xED;as de la escala salarial (8 a 24) y los puestos que las componen</div>
+        </div>
+      </div>
+      <div id="catescalafon-content"></div>
     </section>
 
     <!-- DOCUMENTACIÓN -->
@@ -644,20 +672,69 @@ body {
       </div>
     </section>
 
-    <!-- INFO -->
+    <!-- GUÍA DE USO -->
     <section class="vista" id="vista-info">
       <div class="page-header">
         <div class="page-header-left">
-          <div class="ph-title">Informaci&#xF3;n Adicional</div>
-          <div class="ph-sub">Sobre el sistema y la Direcci&#xF3;n de RRHH</div>
+          <div class="ph-title">Gu&#xED;a de uso</div>
+          <div class="ph-sub">C&#xF3;mo navegar y aprovechar el Nomenclador de Puestos</div>
         </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:32px;box-shadow:var(--sh)">
-        <div style="max-width:560px">
-          <p style="font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:16px">Este sistema fue desarrollado por el <strong>Departamento de Ingresos, Formaci&#xF3;n y Movilidad</strong> de la <strong>Direcci&#xF3;n de Recursos Humanos</strong> de la Municipalidad de San Carlos de Bariloche.</p>
-          <p style="font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:16px">Permite visualizar el nomenclador de puestos municipal, el organigrama de la instituci&#xF3;n, y gestionar solicitudes de creaci&#xF3;n o modificaci&#xF3;n de estructuras organizativas.</p>
-          <p style="font-size:13px;line-height:1.7;color:var(--text2)">Para consultas t&#xE9;cnicas o de contenido, dirigirse a la Direcci&#xF3;n de RRHH &mdash; MSCB.</p>
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--sh)">
+          <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px">&#x1F3E0; Inicio</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text2)">La pantalla de inicio muestra un resumen del sistema: total de cargos registrados, &#xE1;reas y direcciones. Desde ac&#xE1; pod&#xE9;s acceder r&#xE1;pidamente a cada secci&#xF3;n haciendo clic en las tarjetas.</p>
         </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--sh)">
+          <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px">&#x1F4CB; Puestos</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text2)">Ac&#xE1; encontr&#xE1;s el cat&#xE1;logo completo de cargos municipales. Pod&#xE9;s:</p>
+          <ul style="font-size:13px;line-height:2;color:var(--text2);padding-left:20px;margin-top:6px">
+            <li>Usar los <strong>filtros</strong> del panel izquierdo para acotar por nivel, orientaci&#xF3;n o secretar&#xED;a.</li>
+            <li>Usar la <strong>barra de b&#xFA;squeda</strong> (parte superior) para buscar por nombre, c&#xF3;digo o texto de la misi&#xF3;n.</li>
+            <li>Hacer clic en cualquier cargo para abrir su <strong>ficha completa</strong> con misi&#xF3;n, funciones, requisitos, competencias y m&#xE1;s.</li>
+            <li>Desde la ficha pod&#xE9;s <strong>copiar el c&#xF3;digo</strong>, <strong>compartir el enlace directo</strong> o <strong>imprimir / exportar a PDF</strong>.</li>
+          </ul>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--sh)">
+          <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px">&#x1F5FA;&#xFE0F; Organigrama</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text2)">Muestra la estructura jer&#xE1;rquica visual del municipio: secretar&#xED;as, direcciones y departamentos. Pod&#xE9;s filtrar por secretar&#xED;a usando el men&#xFA; desplegable y hacer clic en cualquier nodo para ver la ficha del cargo.</p>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--sh)">
+          <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px">&#x1F4C2; Puestos por &#xE1;rea</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text2)">Muestra las secretar&#xED;as como tarjetas con el total de cargos y direcciones que las componen. Haciendo clic en una tarjeta se navega autom&#xE1;ticamente al listado de Puestos filtrado por esa secretar&#xED;a.</p>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--sh)">
+          <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px">&#x1F3F7;&#xFE0F; Agrupamientos</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text2)">Agrupa los cargos seg&#xFA;n su <strong>tipo de puesto</strong> (por ejemplo: Administrativo/a, T&#xE9;cnico/a, Profesional, etc.). Permite ver cu&#xE1;ntos y cu&#xE1;les cargos pertenecen a cada agrupamiento.</p>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--sh)">
+          <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px">&#x1F4B0; Adicionales por puesto</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text2)">Lista todos los adicionales salariales vigentes y qu&#xE9; puestos los perciben. Util para consultar r&#xE1;pidamente qu&#xE9; cargos tienen asignado un adicional espec&#xED;fico.</p>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--sh)">
+          <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px">&#x1F522; Categor&#xED;as</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text2)">Muestra todas las categor&#xED;as de la escala salarial (de la 8 a la 24) y qu&#xE9; puestos las componen. Permite identificar la distribuci&#xF3;n de cargos por categor&#xED;a.</p>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--sh)">
+          <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px">&#x270F;&#xFE0F; Solicitar modificaci&#xF3;n</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text2)">El bot&#xF3;n <strong>&#x201C;Solicitar modificaci&#xF3;n&#x201D;</strong> (barra lateral izquierda) abre el formulario para registrar la creaci&#xF3;n de una nueva estructura o la modificaci&#xF3;n de una existente. La Direcci&#xF3;n de RRHH recibir&#xE1; notificaci&#xF3;n autom&#xE1;tica.</p>
+        </div>
+
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--r-lg);padding:20px 24px">
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.7">
+            <strong>Desarrollado por:</strong> Departamento de Ingresos, Formaci&#xF3;n y Movilidad &middot; Direcci&#xF3;n de Recursos Humanos &middot; MSCB.<br>
+            Para consultas t&#xE9;cnicas o de contenido, comunicate con la Direcci&#xF3;n de RRHH.
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -698,6 +775,7 @@ body {
     <div class="detalle-header" id="detalle-header"></div>
     <div class="detalle-tabs" id="detalle-tabs">
       <div class="det-tab activo" onclick="cambiarTab('descripcion')" id="tab-descripcion">Descripci&#xF3;n</div>
+      <div class="det-tab" onclick="cambiarTab('competencias')" id="tab-competencias">Competencias</div>
       <div class="det-tab" onclick="cambiarTab('info')" id="tab-info">Info adicional</div>
       <div class="det-tab" onclick="cambiarTab('requisitos')" id="tab-requisitos">Requisitos</div>
       <div class="det-tab" onclick="cambiarTab('contexto')" id="tab-contexto">Contexto</div>
@@ -783,6 +861,8 @@ function inicializarUI() {
   renderizarNomenclador();
   renderizarAreas();
   renderizarCategorias();
+  renderizarAdicionales();
+  renderizarCatEscalafon();
   renderizarOrganigrama();
   abrirDesdeUrl();
 }
@@ -827,9 +907,10 @@ function setText(id, val) {
 // NAVEGACIÓN
 // ============================================================
 var BREADCRUMBS = {
-  inicio:'Inicio', organigrama:'Organigrama', nomenclador:'Nomenclador',
-  areas:'\xC1reas', categorias:'Categor\xEDas', documentacion:'Documentaci\xF3n',
-  info:'Informaci\xF3n adicional', registro:'Solicitudes'
+  inicio:'Inicio', organigrama:'Organigrama', nomenclador:'Puestos',
+  areas:'Puestos por \xE1rea', categorias:'Agrupamientos', documentacion:'Documentaci\xF3n',
+  info:'Gu\xEDa de uso', registro:'Solicitudes',
+  adicionales:'Adicionales por puesto', catescalafon:'Categor\xEDas'
 };
 
 function navegar(vista) {
@@ -1083,7 +1164,13 @@ function renderizarTabDetalle(tab) {
     // Ubicación
     html +=
       '<div class="det-section">' +
-      '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Ubicaci\xF3n en la estructura</div>' +
+      '<div class="det-section-title" style="display:flex;align-items:center;justify-content:space-between">' +
+        '<span><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Ubicaci\xF3n en la estructura</span>' +
+        '<button onclick="cerrarDetalle();navegar(\'organigrama\')" ' +
+          'style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);background:var(--surface2);border-radius:var(--r-sm);font-size:11px;font-weight:600;color:var(--text2);cursor:pointer">' +
+          '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' +
+          'Ver en organigrama</button>' +
+      '</div>' +
       '<div class="det-info-grid">' +
         detInfoItem('Secretar\xEDa', d.secretaria ? (d.secretaria.split('\u2014')[1] || d.secretaria).trim() : '\u2014') +
         detInfoItem('Nivel', d.nivel || '\u2014') +
@@ -1091,6 +1178,46 @@ function renderizarTabDetalle(tab) {
         detInfoItem('Orientaci\xF3n', d.orientacion || '\u2014') +
       '</div>' +
       '</div>';
+
+    body.innerHTML = html;
+
+  } else if (tab === 'competencias') {
+    var html = '';
+
+    if (d.competenciasPrincipales || d.competenciasSecundarias) {
+      html +=
+        '<div class="det-section">' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Competencias del puesto</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">' +
+          '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--r);padding:14px">' +
+            '<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Primarias</div>' +
+            '<div style="font-size:12.5px;color:var(--text);line-height:1.7;white-space:pre-wrap">' + (d.competenciasPrincipales || '<span style="color:var(--text3)">Sin datos cargados</span>') + '</div>' +
+          '</div>' +
+          '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--r);padding:14px">' +
+            '<div style="font-size:11px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Secundarias</div>' +
+            '<div style="font-size:12.5px;color:var(--text);line-height:1.7;white-space:pre-wrap">' + (d.competenciasSecundarias || '<span style="color:var(--text3)">Sin datos cargados</span>') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '</div>';
+    } else {
+      html += '<div class="det-section"><div class="det-mision" style="color:var(--text3)">No hay competencias cargadas para este puesto a\xFAn.</div></div>';
+    }
+
+    if (d.resultadosIndicadores) {
+      html +=
+        '<div class="det-section">' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Resultados e indicadores</div>' +
+        '<div class="det-mision" style="white-space:pre-wrap">' + d.resultadosIndicadores + '</div>' +
+        '</div>';
+    }
+
+    if (d.responsabilidades) {
+      html +=
+        '<div class="det-section">' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Responsabilidades</div>' +
+        '<div class="det-mision" style="white-space:pre-wrap">' + d.responsabilidades + '</div>' +
+        '</div>';
+    }
 
     body.innerHTML = html;
 
@@ -1232,7 +1359,7 @@ function imprimirFicha() {
   var savedTab = tabDetalle;
   var body = document.getElementById('detalle-body');
   var full = '';
-  ['descripcion', 'info', 'requisitos', 'contexto'].forEach(function(t){
+  ['descripcion', 'competencias', 'info', 'requisitos', 'contexto'].forEach(function(t){
     renderizarTabDetalle(t);
     full += body.innerHTML;
   });
@@ -1335,6 +1462,100 @@ function renderizarCategorias() {
             '</div>';
         }).join('') +
         (cat[o].length > 5 ? '<div style="font-size:11px;color:var(--text3);padding:6px 12px">+ ' + (cat[o].length - 5) + ' m\xE1s...</div>' : '') +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// ============================================================
+// ADICIONALES POR PUESTO
+// ============================================================
+function renderizarAdicionales() {
+  var cont = document.getElementById('adicionales-content');
+  if (!cont) return;
+  var mapa = {};
+  DATOS.forEach(function(d) {
+    [d.adicional1, d.adicional2].forEach(function(ad) {
+      if (ad) {
+        if (!mapa[ad]) mapa[ad] = [];
+        mapa[ad].push(d);
+      }
+    });
+  });
+  var keys = Object.keys(mapa).sort();
+  if (keys.length === 0) {
+    cont.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:32px;box-shadow:var(--sh)"><div class="empty-state"><div class="es-title">Sin adicionales registrados</div><div class="es-sub">No se encontraron adicionales en los datos actuales.</div></div></div>';
+    return;
+  }
+  var COLORS = ['#dbeafe','#ede9fe','#d1fae5','#fff7ed','#fce7f3','#fef3c7'];
+  cont.innerHTML = keys.map(function(k, idx) {
+    var puestos = mapa[k];
+    var bg = COLORS[idx % COLORS.length];
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:16px;overflow:hidden;box-shadow:var(--sh)">' +
+      '<div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:' + bg + '">' +
+        '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' +
+        '<div>' +
+          '<div style="font-size:14px;font-weight:700;color:var(--navy)">' + k + '</div>' +
+          '<div style="font-size:11px;color:var(--text2)">' + puestos.length + ' puesto' + (puestos.length !== 1 ? 's' : '') + ' con este adicional</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="padding:12px 16px;display:flex;flex-direction:column;gap:6px">' +
+        puestos.map(function(d) {
+          return '<div onclick="abrirDetalle('' + esc(d.codigo) + '','' + esc(d.tipoRegistro) + '')" ' +
+            'style="padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .15s" ' +
+            'onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">' +
+            '<span style="font-family:Courier New,monospace;font-size:10px;color:var(--text3);min-width:80px">' + (d.codigo || '') + '</span>' +
+            '<span style="font-size:12.5px;font-weight:600;color:var(--navy)">' + (d.nombreCargo || '') + '</span>' +
+            '<span style="margin-left:auto;font-size:10px;color:var(--text3)">' + (d.nivel || '') + '</span>' +
+            '</div>';
+        }).join('') +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// ============================================================
+// CATEGORÍAS ESCALAFÓN
+// ============================================================
+function renderizarCatEscalafon() {
+  var cont = document.getElementById('catescalafon-content');
+  if (!cont) return;
+  var mapa = {};
+  DATOS.forEach(function(d) {
+    var cat = d.categoria;
+    if (cat) {
+      if (!mapa[cat]) mapa[cat] = [];
+      mapa[cat].push(d);
+    }
+  });
+  var keys = Object.keys(mapa).sort(function(a, b) {
+    return (parseInt(a) || 0) - (parseInt(b) || 0);
+  });
+  if (keys.length === 0) {
+    cont.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:32px;box-shadow:var(--sh)"><div class="empty-state"><div class="es-title">Sin categorías registradas</div><div class="es-sub">No se encontraron categorías salariales en los datos actuales.</div></div></div>';
+    return;
+  }
+  var COLORS = ['#dbeafe','#ede9fe','#d1fae5','#fff7ed','#fce7f3','#fef3c7','#f0fdf4','#eff6ff'];
+  cont.innerHTML = keys.map(function(k, idx) {
+    var puestos = mapa[k];
+    var bg = COLORS[idx % COLORS.length];
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:16px;overflow:hidden;box-shadow:var(--sh)">' +
+      '<div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:' + bg + '">' +
+        '<div style="width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.1)">' + k + '</div>' +
+        '<div>' +
+          '<div style="font-size:14px;font-weight:700;color:var(--navy)">Categor\xEDa ' + k + '</div>' +
+          '<div style="font-size:11px;color:var(--text2)">' + puestos.length + ' puesto' + (puestos.length !== 1 ? 's' : '') + ' en esta categor\xEDa</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="padding:12px 16px;display:flex;flex-direction:column;gap:6px">' +
+        puestos.map(function(d) {
+          return '<div onclick="abrirDetalle('' + esc(d.codigo) + '','' + esc(d.tipoRegistro) + '')" ' +
+            'style="padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .15s" ' +
+            'onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">' +
+            '<span style="font-family:Courier New,monospace;font-size:10px;color:var(--text3);min-width:80px">' + (d.codigo || '') + '</span>' +
+            '<span style="font-size:12.5px;font-weight:600;color:var(--navy)">' + (d.nombreCargo || '') + '</span>' +
+            '</div>';
+        }).join('') +
       '</div>' +
       '</div>';
   }).join('');
