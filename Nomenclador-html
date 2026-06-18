@@ -1582,9 +1582,39 @@ function verEnOrganigrama() {
   var d = puestoDetalle;
   if (!d) return;
 
-  // Los no jerárquicos no figuran en el organigrama
+  // No jerárquicos: navegar al nodo del que dependen
   if (d.tipoRegistro === 'nojerarquico') {
-    mostrarToast('Los puestos no jer\xE1rquicos no aparecen en el organigrama', true);
+    var dep = d.secretaria || '';
+    var codigoPadre = MAPA_DEPENDENCIAS[dep] || '';
+    if (!codigoPadre) {
+      mostrarToast('No se encontró la dependencia de este puesto en el organigrama', true);
+      return;
+    }
+    var padre = DATOS.filter(function(x){ return x.codigo === codigoPadre; })[0];
+    if (!padre) {
+      mostrarToast('El nodo del que depende este puesto no está en el organigrama', true);
+      return;
+    }
+    // Expandir su dirección padre si hace falta
+    if (padre.nivel !== 'Dirección' && padre.secretaria) {
+      DATOS.forEach(function(item) {
+        if (item.nivel === 'Dirección' && item.secretaria === padre.secretaria) {
+          orgExpandido[item.codigo] = true;
+        }
+      });
+    }
+    if (padre.secretaria) {
+      var sel = document.getElementById('org-filtro-sec');
+      if (sel) {
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === padre.secretaria) { sel.value = padre.secretaria; break; }
+        }
+      }
+    }
+    orgTargetCodigo = codigoPadre;
+    cerrarDetalle();
+    navegar('organigrama');
+    renderizarOrganigrama();
     return;
   }
 
