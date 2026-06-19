@@ -1642,9 +1642,9 @@ function toggleOrgExpand(ev, codigo) {
   renderizarOrganigrama();
 }
 
-function renderizarOrganigrama(targetCodigo) {
+function renderizarOrganigrama(targetCodigo, secOverride) {
   var area = document.getElementById('org-area');
-  var filtroSecOrg = document.getElementById('org-filtro-sec').value;
+  var filtroSecOrg = (secOverride !== undefined) ? secOverride : document.getElementById('org-filtro-sec').value;
 
   if (!filtroSecOrg) {
     area.innerHTML =
@@ -1817,16 +1817,12 @@ function mostrarOrgModal(secretaria, targetCodigo, nombrePuesto, todasAreas) {
     ? 'Mostrando \xE1rea: ' + (todasAreas[0].nombre || targetCodigo)
     : (secStr ? secStr.split('\u2014')[1] || secStr : '');
 
-  // Render org for this secretar\u00eda with target highlighted
-  var savedFiltro = document.getElementById('org-filtro-sec').value;
-  document.getElementById('org-filtro-sec').value = secStr || '';
-  renderizarOrganigrama(targetCodigo);
-  // Capture and move to modal body
+  // Render org directly into modal body using secStr override (no select manipulation)
+  renderizarOrganigrama(targetCodigo, secStr || '');
   var orgArea = document.getElementById('org-area');
   body.innerHTML = orgArea.innerHTML;
-  // Restore org-area
-  document.getElementById('org-filtro-sec').value = savedFiltro;
-  renderizarOrganigrama();
+  // Restore org-area to its previous state
+  renderizarOrganigrama(undefined, undefined);
 
   // Re-scroll in modal
   overlay.style.display = 'flex';
@@ -1851,14 +1847,11 @@ function mostrarOrgModal(secretaria, targetCodigo, nombrePuesto, todasAreas) {
 function cambiarAreaModal(areaCodigo, areaNombre, nombrePuesto) {
   var areaData = DATOS.find(function(j){ return j.codigo === areaCodigo; });
   var secStr = areaData ? areaData.secretaria : '';
-  var savedFiltro = document.getElementById('org-filtro-sec').value;
-  document.getElementById('org-filtro-sec').value = secStr || '';
-  renderizarOrganigrama(areaCodigo);
+  renderizarOrganigrama(areaCodigo, secStr || '');
   var orgArea = document.getElementById('org-area');
   var body = document.getElementById('org-modal-body');
   var newContent = orgArea.innerHTML;
-  document.getElementById('org-filtro-sec').value = savedFiltro;
-  renderizarOrganigrama();
+  renderizarOrganigrama(undefined, undefined);
   // Replace everything after the tabs row
   var tabsDiv = body.querySelector('div[style*="margin-bottom:16px"]');
   if (tabsDiv) {
