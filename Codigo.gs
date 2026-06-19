@@ -105,9 +105,9 @@ function getDatosCombinados() {
           tipoPuesto:        tipo,
           codigoPuesto:      '',
           orientacion:       orientacionDesdeTipo_(tipo),
-          secretaria:        String(f[8] || '').trim(), // dependencia directa como referencia
+          secretaria:        String(f[9] || '').trim(), // dependencia directa como referencia
           misionGenerica:    '',   // se carga solo en el detalle
-          misionEspecifica:  String(f[9] || '').trim(),
+          misionEspecifica:  String(f[10] || '').trim(),
           requiereTitulo:    String(f[3] || '').trim() !== '' ? 'Sí' : 'No',
           requiereMatricula: 'No',
           normativa:         '',
@@ -184,8 +184,8 @@ function getDetallePuesto(codigo, tipoRegistro) {
         codigoPuesto:          '',
         orientacion:           orientacionDesdeTipo_(tipoPuesto),
         secretaria:            '',
-        dependencia:           String(filaCargo[8] || '').trim(),
-        misionEspecifica:      String(filaCargo[9] || '').trim(),
+        dependencia:           String(filaCargo[9] || '').trim(),
+        misionEspecifica:      String(filaCargo[10] || '').trim(),
         requisitosEspecificos: '',
         titulacion:            String(filaCargo[3] || '').trim(),
         requiereTitulo:        String(filaCargo[3] || '').trim() !== '' ? 'Sí' : 'No',
@@ -195,10 +195,10 @@ function getDetallePuesto(codigo, tipoRegistro) {
         adicional1:              String(filaCargo[6]  || '').trim(),
         adicional2:              String(filaCargo[7]  || '').trim(),
         normativa:               '',
-        competenciasPrincipales: String(filaCargo[10] || '').trim(),
-        competenciasSecundarias: String(filaCargo[11] || '').trim(),
-        resultadosIndicadores:   String(filaCargo[12] || '').trim(),
-        responsabilidades:       String(filaCargo[13] || '').trim(),
+        competenciasPrincipales: String(filaCargo[11] || '').trim(),
+        competenciasSecundarias: String(filaCargo[12] || '').trim(),
+        resultadosIndicadores:   String(filaCargo[13] || '').trim(),
+        responsabilidades:       String(filaCargo[14] || '').trim(),
         puestoGenerico:          null,
         areas:                   []
       };
