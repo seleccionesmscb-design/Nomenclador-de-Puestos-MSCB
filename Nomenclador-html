@@ -968,7 +968,8 @@ function datosFiltrados() {
           || (d.tipoPuesto  || '').toLowerCase().includes(t)
           || (d.secretaria  || '').toLowerCase().includes(t)
           || (d.misionEspecifica || '').toLowerCase().includes(t)
-          || (d.misionGenerica   || '').toLowerCase().includes(t);
+          || (d.misionGenerica   || '').toLowerCase().includes(t)
+          || (d.areas && d.areas.some(function(a){ return a.nombre.toLowerCase().includes(t); }));
     }
     return true;
   }).sort(function(a, b){
@@ -1028,13 +1029,22 @@ function renderizarNomenclador() {
     // Para no jerárquicos usamos la dependencia como referencia de área
     var refArea = secNombre || d.secretaria || '';
     var esNoJer = d.tipoRegistro === 'nojerarquico';
+    // Para no jerárquicos: mostrar pills de áreas desde Hoja 1
+    var areasMeta = '';
+    if (esNoJer && d.areas && d.areas.length > 0) {
+      var shown = d.areas.slice(0, 2);
+      var extra = d.areas.length > 2 ? ' <span style="color:var(--text3);font-size:10px">+' + (d.areas.length - 2) + ' m\xE1s</span>' : '';
+      areasMeta = shown.map(function(a){
+        return '<span style="display:inline-block;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:4px;font-size:10px;padding:1px 6px;margin-right:3px">' + a.nombre + '</span>';
+      }).join('') + extra;
+    }
     return '<div class="nom-card" onclick="abrirDetalle(\'' + esc(d.codigo) + '\', \'' + (d.tipoRegistro || 'jerarquico') + '\')" id="nc_' + esc(d.codigo) + '">' +
       '<div class="nc-nivel ' + nc + '">' + (esNoJer ? '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' : (NIVEL_ICONS[d.nivel] || '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>')) + '</div>' +
       '<div class="nc-body">' +
         '<div class="nc-nombre">' + (d.nombreCargo || '') + '</div>' +
         '<div class="nc-meta">' +
           '<span class="nc-codigo">' + (esNoJer ? (d.tipoPuesto || 'No jer\xE1rquico') : (d.codigo || '')) + '</span>' +
-          (refArea ? '<span class="nc-sec">&middot; ' + refArea + '</span>' : '') +
+          (esNoJer && areasMeta ? '<span style="margin-left:6px">' + areasMeta + '</span>' : (!esNoJer && refArea ? '<span class="nc-sec">&middot; ' + refArea + '</span>' : '')) +
         '</div>' +
         '<div class="nc-tags">' +
           (esNoJer
@@ -1172,7 +1182,10 @@ function renderizarTabDetalle(tab) {
           'Ver en organigrama</button>' +
       '</div>' +
       '<div class="det-info-grid">' +
-        detInfoItem('Secretar\xEDa', d.secretaria ? (d.secretaria.split('\u2014')[1] || d.secretaria).trim() : '\u2014') +
+        (d.tipoRegistro === 'nojerarquico'
+          ? detInfoItemAreas('\xC1reas de pertenencia', d.areas || [])
+          : detInfoItem('Secretar\xEDa', d.secretaria ? (d.secretaria.split('\u2014')[1] || d.secretaria).trim() : '\u2014')
+        ) +
         detInfoItem('Nivel', d.nivel || '\u2014') +
         detInfoItem('C\xF3digo', d.codigo, true) +
         detInfoItem('Orientaci\xF3n', d.orientacion || '\u2014') +
@@ -1295,7 +1308,20 @@ function renderizarTabDetalle(tab) {
       '<div class="det-mision">' + (d.contexto || 'Sin informaci\xF3n disponible.') + '</div>' +
       '</div>';
 
-    if (d.secretaria) {
+    if (d.tipoRegistro === 'nojerarquico' && d.areas && d.areas.length > 0) {
+      html +=
+        '<div class="det-section">' +
+        '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg> \xC1reas de pertenencia</div>' +
+        '<div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">' +
+          d.areas.map(function(a){
+            return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px">' +
+              '<span style="font-family:Courier New,monospace;font-size:10px;color:var(--text3);min-width:80px">' + a.codigo + '</span>' +
+              '<span style="font-size:12.5px;color:var(--navy);font-weight:500">' + a.nombre + '</span>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        '</div>';
+    } else if (d.secretaria) {
       html +=
         '<div class="det-section">' +
         '<div class="det-section-title"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg> \xC1rea de pertenencia</div>' +
@@ -1322,6 +1348,21 @@ function detInfoItem(label, val, mono) {
   return '<div class="det-info-item">' +
     '<div class="dii-label">' + label + '</div>' +
     '<div class="dii-val' + (mono ? ' mono' : '') + '">' + (val || '\u2014') + '</div>' +
+    '</div>';
+}
+
+function detInfoItemAreas(label, areas) {
+  var contenido = areas.length === 0
+    ? '<span style="color:var(--text3)">\u2014</span>'
+    : areas.map(function(a){
+        return '<div style="margin-bottom:3px">' +
+          '<span style="font-size:10px;font-family:Courier New,monospace;color:var(--text3);margin-right:6px">' + a.codigo + '</span>' +
+          '<span style="font-size:12px;color:var(--navy)">' + a.nombre + '</span>' +
+        '</div>';
+      }).join('');
+  return '<div class="det-info-item" style="grid-column:1/-1">' +
+    '<div class="dii-label">' + label + '</div>' +
+    '<div class="dii-val" style="line-height:1.8">' + contenido + '</div>' +
     '</div>';
 }
 

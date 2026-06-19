@@ -7,6 +7,7 @@ var SPREADSHEET_ID_NOMENCLADOR = '16r3ZmX5rI5e6tnYyOz8e5NW6ewe7bn_vFEdyjU9Nx6Q';
 var HOJA_BD_NOM     = 'BD_Nomenclador';
 var HOJA_25_PUESTOS = '25 Puestos';
 var HOJA_NO_JER     = 'BD_Puestos_NoJerarquicos';
+var HOJA_1          = 'Hoja 1';
 
 // Fila 1 = título, fila 2 = headers, fila 3 = primera fila de datos
 var FILA_DATA_INICIO = 3;
@@ -116,6 +117,27 @@ function getDatosCombinados() {
         };
       });
 
+    // ── 3. Agregar áreas correctas a no jerárquicos desde Hoja 1 ──
+    var areaMap = getAreaMappings_();
+
+    // Regla especial: "Administrativo/a general" → todas las áreas cuyo nombre
+    // contenga "administrativ" (ej: "División Administrativa de ...", "Dept. Administrativo de ...")
+    var areasAdminGeneral = datosJer
+      .filter(function(j) {
+        return (j.nombreCargo || '').toLowerCase().indexOf('administrativ') !== -1;
+      })
+      .map(function(j) { return { codigo: j.codigo, nombre: j.nombreCargo }; });
+
+    datosNoJer = datosNoJer.map(function(p) {
+      var nombre = (p.nombreCargo || '').trim();
+      if (/administrativ[ao]\/a general/i.test(nombre)) {
+        p.areas = areasAdminGeneral;
+      } else {
+        p.areas = areaMap[nombre] || [];
+      }
+      return p;
+    });
+
     return { ok: true, datos: datosJer.concat(datosNoJer) };
 
   } catch (err) {
@@ -177,8 +199,26 @@ function getDetallePuesto(codigo, tipoRegistro) {
         competenciasSecundarias: String(filaCargo[11] || '').trim(),
         resultadosIndicadores:   String(filaCargo[12] || '').trim(),
         responsabilidades:       String(filaCargo[13] || '').trim(),
-        puestoGenerico:          null
+        puestoGenerico:          null,
+        areas:                   []
       };
+
+      // Agregar áreas correctas desde Hoja 1
+      var areaMapDet = getAreaMappings_();
+      var nomCargoDet = detalle.nombreCargo;
+      if (/administrativ[ao]\/a general/i.test(nomCargoDet)) {
+        var hojaJerDet = ss.getSheetByName(HOJA_BD_NOM);
+        if (hojaJerDet) {
+          detalle.areas = hojaJerDet.getDataRange().getValues()
+            .slice(FILA_DATA_INICIO - 1)
+            .filter(function(f) {
+              return (String(f[2] || '').toLowerCase()).indexOf('administrativ') !== -1;
+            })
+            .map(function(f) { return { codigo: String(f[0]||'').trim(), nombre: String(f[2]||'').trim() }; });
+        }
+      } else {
+        detalle.areas = areaMapDet[nomCargoDet] || [];
+      }
 
     } else {
       // ── Jerárquico: leer BD_Nomenclador ──
@@ -250,6 +290,39 @@ function getDetallePuesto(codigo, tipoRegistro) {
   } catch (err) {
     return { ok: false, mensaje: err.toString() };
   }
+}
+
+
+// ============================================================
+// getAreaMappings_
+// Lee "Hoja 1" y devuelve un mapa nombrePuesto → [{codigo, nombre}]
+// Solo incluye filas con área asignada real (descarta textos libres).
+// ============================================================
+
+function getAreaMappings_() {
+  try {
+    var ss   = SpreadsheetApp.openById(SPREADSHEET_ID_NOMENCLADOR);
+    var hoja = ss.getSheetByName(HOJA_1);
+    if (!hoja) return {};
+    var vals = hoja.getDataRange().getValues();
+    var map  = {};
+    var curr = null;
+    for (var i = 0; i < vals.length; i++) {
+      var r      = vals[i];
+      var puesto = String(r[0] || '').trim();
+      var codigo = String(r[2] || '').trim();
+      var nombre = String(r[3] || '').trim();
+      if (puesto && puesto !== 'Puesto') {
+        curr = puesto;
+        if (!map[curr]) map[curr] = [];
+      }
+      // Solo agrega si tiene nombre de área real y código razonable (no texto libre)
+      if (curr && nombre && codigo && codigo.length <= 40 && !/deberi|este puesto/i.test(codigo)) {
+        map[curr].push({ codigo: codigo, nombre: nombre });
+      }
+    }
+    return map;
+  } catch (e) { return {}; }
 }
 
 
