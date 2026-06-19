@@ -683,6 +683,40 @@ body {
           <div class="ph-sub">Categor&#xED;as de la escala salarial (8 a 24) y los puestos que las componen</div>
         </div>
       </div>
+      <!-- Leyenda de perfiles -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--sh)">
+        <div onclick="var b=document.getElementById('cat-leyenda-body');var arr=document.getElementById('cat-leyenda-arr');b.style.display=b.style.display==='none'?'block':'none';arr.textContent=b.style.display==='none'?'▼':'▲'"
+          style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:linear-gradient(90deg,#eff6ff,var(--surface));border-bottom:1px solid var(--border)">
+          <div>
+            <span style="font-size:13px;font-weight:700;color:var(--navy)">&#x1F4CB; Tabla de referencia de perfiles y categor&#xED;as</span>
+            <span style="font-size:11px;color:var(--text3);margin-left:10px">&#xBF;Qu&#xE9; requiere cada categor&#xED;a?</span>
+          </div>
+          <span id="cat-leyenda-arr" style="font-size:12px;color:var(--text3)">&#x25BC;</span>
+        </div>
+        <div id="cat-leyenda-body" style="display:none;padding:16px 20px;overflow-x:auto">
+          <table style="border-collapse:collapse;width:100%;font-size:12px;min-width:420px">
+            <thead>
+              <tr style="background:#dbeafe">
+                <th style="padding:8px 12px;text-align:left;border:1px solid #bfdbfe;color:var(--navy);font-weight:700">Perfil</th>
+                <th style="padding:8px 12px;text-align:left;border:1px solid #bfdbfe;color:var(--navy);font-weight:700">Requisitos objetivos del perfil</th>
+                <th style="padding:8px 12px;text-align:center;border:1px solid #bfdbfe;color:var(--navy);font-weight:700">Categor&#xED;a</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:var(--surface)"><td style="padding:7px 12px;border:1px solid var(--border)">1</td><td style="padding:7px 12px;border:1px solid var(--border)">No requieren secundario de forma excluyente</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">8</td></tr>
+              <tr style="background:var(--surface2)"><td style="padding:7px 12px;border:1px solid var(--border)">2</td><td style="padding:7px 12px;border:1px solid var(--border)">No requieren secundario. Requieren conocimientos espec&#xED;ficos b&#xE1;sicos para la ejecuci&#xF3;n de tareas. O implican abordaje de situaciones sociales complejas</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">10</td></tr>
+              <tr style="background:var(--surface)"><td style="padding:7px 12px;border:1px solid var(--border)">3</td><td style="padding:7px 12px;border:1px solid var(--border)">Secundario completo (como requisito excluyente)</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">12</td></tr>
+              <tr style="background:var(--surface2)"><td style="padding:7px 12px;border:1px solid var(--border)">4</td><td style="padding:7px 12px;border:1px solid var(--border)">Secundario completo excluyente, sumado a Oficiales de oficios t&#xE9;cnicos con suficiente experticia/idoneidad o abordaje de situaciones sociales complejas</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">14</td></tr>
+              <tr style="background:var(--surface)"><td style="padding:7px 12px;border:1px solid var(--border)">5</td><td style="padding:7px 12px;border:1px solid var(--border)">Jefaturas de secci&#xF3;n, o coordinaciones/supervisiones/lideran personal a&#xFA;n sin puesto jer&#xE1;rquico</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">16</td></tr>
+              <tr style="background:var(--surface2)"><td style="padding:7px 12px;border:1px solid var(--border)">6</td><td style="padding:7px 12px;border:1px solid var(--border)">Formaci&#xF3;n de pregrado, educaci&#xF3;n superior no universitaria excluyente</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">17</td></tr>
+              <tr style="background:var(--surface)"><td style="padding:7px 12px;border:1px solid var(--border)">7</td><td style="padding:7px 12px;border:1px solid var(--border)">Formaci&#xF3;n de grado (Universitario) excluyente</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">19</td></tr>
+              <tr style="background:var(--surface2)"><td style="padding:7px 12px;border:1px solid var(--border)">—</td><td style="padding:7px 12px;border:1px solid var(--border)">Divisiones</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">—</td></tr>
+              <tr style="background:var(--surface)"><td style="padding:7px 12px;border:1px solid var(--border)">8</td><td style="padding:7px 12px;border:1px solid var(--border)">Jefaturas de Departamento</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">21</td></tr>
+              <tr style="background:var(--surface2)"><td style="padding:7px 12px;border:1px solid var(--border)">9</td><td style="padding:7px 12px;border:1px solid var(--border)">Direcciones</td><td style="padding:7px 12px;border:1px solid var(--border);text-align:center;font-weight:700">23</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
       <div id="catescalafon-content"></div>
     </section>
 
@@ -991,7 +1025,10 @@ function datosFiltrados() {
   return DATOS.filter(function(d){
     if (filtroNivel  && d.nivel       !== filtroNivel)  return false;
     if (filtroOrient && d.orientacion !== filtroOrient) return false;
-    if (filtroSec    && d.secretaria  !== filtroSec)    return false;
+    if (filtroSec) {
+      var secEfectiva = d.secretaria || 'Sin secretar\xEDa';
+      if (secEfectiva !== filtroSec) return false;
+    }
     if (terminoBusqueda) {
       var t = terminoBusqueda.toLowerCase();
       return (d.nombreCargo || '').toLowerCase().includes(t)
@@ -1383,17 +1420,30 @@ function detInfoItem(label, val, mono) {
 }
 
 function detInfoItemAreas(label, areas) {
-  var contenido = areas.length === 0
-    ? '<span style="color:var(--text3)">\u2014</span>'
-    : areas.map(function(a){
-        return '<div style="margin-bottom:3px">' +
-          '<span style="font-size:10px;font-family:Courier New,monospace;color:var(--text3);margin-right:6px">' + a.codigo + '</span>' +
-          '<span style="font-size:12px;color:var(--navy)">' + a.nombre + '</span>' +
-        '</div>';
-      }).join('');
+  if (areas.length === 0) {
+    return '<div class="det-info-item" style="grid-column:1/-1">' +
+      '<div class="dii-label">' + label + '</div>' +
+      '<div class="dii-val"><span style="color:var(--text3)">\u2014</span></div>' +
+      '</div>';
+  }
+  var MOSTRAR = 4;
+  var uid = 'areas_' + Math.random().toString(36).substr(2, 6);
+  var renderItem = function(a) {
+    return '<div style="margin-bottom:3px">' +
+      '<span style="font-size:10px;font-family:Courier New,monospace;color:var(--text3);margin-right:6px">' + a.codigo + '</span>' +
+      '<span style="font-size:12px;color:var(--navy)">' + a.nombre + '</span>' +
+      '</div>';
+  };
+  var visible  = areas.slice(0, MOSTRAR).map(renderItem).join('');
+  var ocultas  = areas.slice(MOSTRAR);
+  var extra    = ocultas.length > 0
+    ? '<div id="' + uid + '" style="display:none">' + ocultas.map(renderItem).join('') + '</div>' +
+      '<button onclick="var p=document.getElementById(\'' + uid + '\');var b=this;if(p.style.display===\'none\'){p.style.display=\'\';b.textContent=\'Ver menos \u25b2\';}else{p.style.display=\'none\';b.textContent=\'Ver ' + ocultas.length + ' m\u00e1s \u25bc\';}" ' +
+      'style="margin-top:6px;font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Ver ' + ocultas.length + ' m\xE1s \u25bc</button>'
+    : '';
   return '<div class="det-info-item" style="grid-column:1/-1">' +
-    '<div class="dii-label">' + label + '</div>' +
-    '<div class="dii-val" style="line-height:1.8">' + contenido + '</div>' +
+    '<div class="dii-label">' + label + ' (' + areas.length + ')</div>' +
+    '<div class="dii-val" style="line-height:1.8">' + visible + extra + '</div>' +
     '</div>';
 }
 
@@ -1642,7 +1692,7 @@ function toggleOrgExpand(ev, codigo) {
   renderizarOrganigrama();
 }
 
-function renderizarOrganigrama(targetCodigo, secOverride) {
+function renderizarOrganigrama(targetCodigo, secOverride, sinLimite) {
   var area = document.getElementById('org-area');
   var filtroSecOrg = (secOverride !== undefined) ? secOverride : document.getElementById('org-filtro-sec').value;
 
@@ -1716,7 +1766,7 @@ function renderizarOrganigrama(targetCodigo, secOverride) {
             (subdeps.length > 0 ?
               '<div class="org-stem-down"></div>' +
               '<div class="org-children">' +
-                (orgExpandido[d.codigo] ? subdeps : subdeps.slice(0, 4)).map(function(sub){
+                (sinLimite || orgExpandido[d.codigo] ? subdeps : subdeps.slice(0, 4)).map(function(sub){
                   var noJerEnSub = DATOS.filter(function(nj){
                     return nj.tipoRegistro === 'nojerarquico'
                       && nj.areas && nj.areas.some(function(a){ return a.codigo === sub.codigo; });
@@ -1740,7 +1790,7 @@ function renderizarOrganigrama(targetCodigo, secOverride) {
                     '</div>' +
                   '</div>';
                 }).join('') +
-                (!orgExpandido[d.codigo] && subdeps.length > 4 ?
+                (!sinLimite && !orgExpandido[d.codigo] && subdeps.length > 4 ?
                   '<div class="org-child">' +
                     '<div class="org-stem-v"></div>' +
                     '<div class="org-node jefatura" onclick="toggleOrgExpand(event,\'' + esc(d.codigo) + '\')" style="font-size:10px;color:var(--accent);font-weight:700">+' + (subdeps.length - 4) + ' m\xE1s</div>' +
@@ -1770,42 +1820,28 @@ function toggleNoJer(event, id) {
   if (panel) panel.classList.toggle('abierto');
 }
 
+function secDesdeCodigo_(cod) {
+  var item = DATOS.find(function(j){ return j.codigo === cod && j.tipoRegistro === 'jerarquico'; });
+  return item ? (item.secretaria || '') : '';
+}
+
 function verEnOrganigrama() {
   var d = puestoDetalle;
   if (!d) return;
   if (d.tipoRegistro === 'jerarquico') {
-    var sec = d.secretaria || '';
-    mostrarOrgModal(sec, d.codigo, d.nombreCargo);
+    mostrarOrgModal(d.secretaria || '', d.codigo, d.nombreCargo, null);
   } else {
     var areas = d.areas || [];
     if (areas.length === 0) {
       mostrarToast('Este puesto no tiene \xE1reas asignadas en el organigrama', true);
       return;
     }
-    if (areas.length === 1) {
-      mostrarOrgModal(areas[0].codigo, areas[0].codigo, d.nombreCargo);
-    } else {
-      // Buscar la secretar\u00eda del primer \u00e1rea jer\u00e1rquica y mostrar modal del primer \u00e1rea
-      var primerAreaCod = areas[0].codigo;
-      var areaData = DATOS.find(function(j){ return j.codigo === primerAreaCod; });
-      var sec = areaData ? areaData.secretaria : '';
-      mostrarOrgModal(sec, primerAreaCod, d.nombreCargo, areas);
-    }
+    var primerSec = secDesdeCodigo_(areas[0].codigo);
+    mostrarOrgModal(primerSec, areas[0].codigo, d.nombreCargo, areas.length > 1 ? areas : null);
   }
 }
 
-function mostrarOrgModal(secretaria, targetCodigo, nombrePuesto, todasAreas) {
-  // Determine secretar\u00eda string from data if only code was passed (nojerarquico areas)
-  var secStr = secretaria;
-  if (secretaria && !secretaria.includes('\u2014')) {
-    var match = DATOS.find(function(j){ return j.codigo === secretaria && j.nivel !== 'No jer\xE1rquico'; });
-    if (match) secStr = match.secretaria;
-    else {
-      // targetCodigo might be area code \u2014 find the direction that matches it
-      match = DATOS.find(function(j){ return j.codigo === targetCodigo; });
-      if (match) secStr = match.secretaria;
-    }
-  }
+function mostrarOrgModal(secStr, targetCodigo, nombrePuesto, todasAreas) {
 
   var overlay = document.getElementById('org-modal-overlay');
   var body    = document.getElementById('org-modal-body');
@@ -1817,12 +1853,11 @@ function mostrarOrgModal(secretaria, targetCodigo, nombrePuesto, todasAreas) {
     ? 'Mostrando \xE1rea: ' + (todasAreas[0].nombre || targetCodigo)
     : (secStr ? secStr.split('\u2014')[1] || secStr : '');
 
-  // Render org directly into modal body using secStr override (no select manipulation)
-  renderizarOrganigrama(targetCodigo, secStr || '');
+  // Render org for modal: sin límite de subdeps, override de secretaría directa
+  renderizarOrganigrama(targetCodigo, secStr || '', true);
   var orgArea = document.getElementById('org-area');
   body.innerHTML = orgArea.innerHTML;
-  // Restore org-area to its previous state
-  renderizarOrganigrama(undefined, undefined);
+  renderizarOrganigrama(undefined, undefined, false);
 
   // Re-scroll in modal
   overlay.style.display = 'flex';
@@ -1845,13 +1880,12 @@ function mostrarOrgModal(secretaria, targetCodigo, nombrePuesto, todasAreas) {
 }
 
 function cambiarAreaModal(areaCodigo, areaNombre, nombrePuesto) {
-  var areaData = DATOS.find(function(j){ return j.codigo === areaCodigo; });
-  var secStr = areaData ? areaData.secretaria : '';
-  renderizarOrganigrama(areaCodigo, secStr || '');
+  var secStr = secDesdeCodigo_(areaCodigo);
+  renderizarOrganigrama(areaCodigo, secStr, true);
   var orgArea = document.getElementById('org-area');
   var body = document.getElementById('org-modal-body');
   var newContent = orgArea.innerHTML;
-  renderizarOrganigrama(undefined, undefined);
+  renderizarOrganigrama(undefined, undefined, false);
   // Replace everything after the tabs row
   var tabsDiv = body.querySelector('div[style*="margin-bottom:16px"]');
   if (tabsDiv) {
