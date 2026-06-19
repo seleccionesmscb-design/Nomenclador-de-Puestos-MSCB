@@ -1001,7 +1001,10 @@ function navegar(vista) {
 function poblarFiltroSecretarias() {
   var secs = [];
   DATOS.forEach(function(d){
-    if (d.secretaria && secs.indexOf(d.secretaria) === -1) secs.push(d.secretaria);
+    // Solo secretarías jerárquicas reales (nivel Secretaría excluido pero el campo secretaria de jerárquicos sí tiene formato "cod — Nombre")
+    if (d.tipoRegistro === 'jerarquico' && d.secretaria && d.secretaria.indexOf('—') !== -1 && secs.indexOf(d.secretaria) === -1) {
+      secs.push(d.secretaria);
+    }
   });
   secs.sort();
   var cont = document.getElementById('filtro-sec');
