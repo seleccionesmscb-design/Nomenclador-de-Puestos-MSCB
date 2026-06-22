@@ -497,7 +497,7 @@ body {
     <section class="vista activa" id="vista-inicio">
       <div class="inicio-hero">
         <div class="hero-label">Municipalidad de San Carlos de Bariloche</div>
-        <h1 class="hero-title">Nomenclador de<br><span>Puestos Municipales</span></h1>
+        <h1 class="hero-title">Nomenclador de<br><span>Puestos y &#xC1;reas Municipales</span></h1>
         <p class="hero-sub">Visualizador del organigrama municipal, descripciones de puestos y gesti&#xF3;n de solicitudes.</p>
         <div class="hero-stats">
           <div class="hero-stat"><span class="hs-num" id="stat-puestos">&ndash;</span><span class="hs-label">Cargos registrados</span></div>
@@ -1388,7 +1388,7 @@ function solicitarModificacion(codigo) {
 function renderizarAreas() {
   var secs = {};
   DATOS.forEach(function(d){
-    var s = d.secretaria || 'Sin secretar\xEDa';
+    var s = d.secretaria || 'Entes Aut\xE1rquicos';
     if (!secs[s]) secs[s] = { nombre: s, dirs: 0, puestos: 0 };
     if (d.nivel === 'Direcci\xF3n') secs[s].dirs++;
     secs[s].puestos++;
@@ -1582,7 +1582,7 @@ function renderizarOrganigrama() {
   }
   var grupos = {};
   dirs.forEach(function(d){
-    var s = d.secretaria || 'Sin secretar\xEDa';
+    var s = d.secretaria || 'Entes Aut\xE1rquicos';
     if (!grupos[s]) grupos[s] = [];
     grupos[s].push(d);
   });

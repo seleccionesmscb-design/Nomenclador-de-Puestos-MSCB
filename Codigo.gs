@@ -2,11 +2,13 @@
 // CONFIGURACIÓN
 // ============================================================
 
-var SPREADSHEET_ID_NOMENCLADOR = '16r3ZmX5rI5e6tnYyOz8e5NW6ewe7bn_vFEdyjU9Nx6Q';
+var SPREADSHEET_ID_NOMENCLADOR  = '16r3ZmX5rI5e6tnYyOz8e5NW6ewe7bn_vFEdyjU9Nx6Q';
+var SPREADSHEET_ID_DESCRIPCIONES = '1en3YVHwGMHRW9uOItAKtH1ezuU4Y4NQvZZ3UFvtvJt8';
 
 var HOJA_BD_NOM     = 'BD_Nomenclador';
 var HOJA_25_PUESTOS = '25 Puestos';
 var HOJA_NO_JER     = 'BD_Puestos_NoJerarquicos';
+var HOJA_BD_PUESTOS = 'BD_Puestos';
 
 // Fila 1 = título, fila 2 = headers, fila 3 = primera fila de datos
 var FILA_DATA_INICIO = 3;
@@ -213,8 +215,8 @@ function getDetallePuesto(codigo, tipoRegistro) {
         requiereMatricula:     String(filaCargo[12] || '').trim(),
         categoria:             '',
         contexto:              '',
-        adicional1:              '',
-        adicional2:              '',
+        adicional1:            '',
+        adicional2:            '',
         normativa:               String(filaCargo[13] || '').trim(),
         competenciasPrincipales: String(filaCargo[14] || '').trim(),
         competenciasSecundarias: String(filaCargo[15] || '').trim(),
@@ -222,6 +224,27 @@ function getDetallePuesto(codigo, tipoRegistro) {
         responsabilidades:       String(filaCargo[17] || '').trim(),
         puestoGenerico:          null
       };
+
+      // Enriquecer con datos salariales desde "base de datos descripciones"
+      try {
+        var ssDesc = SpreadsheetApp.openById(SPREADSHEET_ID_DESCRIPCIONES);
+        var hojaDesc = ssDesc.getSheetByName(HOJA_BD_PUESTOS);
+        if (hojaDesc) {
+          var valDesc = hojaDesc.getDataRange().getValues();
+          var codigoBuscar = String(filaCargo[0]).trim();
+          for (var d = 1; d < valDesc.length; d++) {
+            if (String(valDesc[d][0] || '').trim() === codigoBuscar) {
+              detalle.categoria  = String(valDesc[d][7]  || '').trim();
+              detalle.contexto   = String(valDesc[d][8]  || '').trim();
+              detalle.adicional1 = String(valDesc[d][9]  || '').trim();
+              detalle.adicional2 = String(valDesc[d][10] || '').trim();
+              break;
+            }
+          }
+        }
+      } catch (errDesc) {
+        // Si no se puede leer la hoja de descripciones, continuar sin datos salariales
+      }
     }
 
     // ── Buscar descripción genérica del puesto en "25 Puestos" ──
