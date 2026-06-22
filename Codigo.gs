@@ -17,6 +17,17 @@ var FILA_DATA_INICIO = 3;
 var NIVELES_EXCLUIR = ['Secretaría', 'Subsecretaría', 'Juzgado', 'Concejo',
                        'Tribunal', 'Defensoría', 'Instituto', 'Junta', 'Otro'];
 
+// Datos salariales por nivel (fuente: Tabla_nombre_puestoperfiles_categorias)
+var SALARIO_POR_NIVEL = {
+  'Dirección':         { categoria: '23', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Dirección General': { categoria: '23', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Dirección Técnica Contable': { categoria: '23', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Delegación':        { categoria: '23', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Departamento':      { categoria: '21', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'División':          { categoria: '19', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Sección':           { categoria: '16', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' }
+};
+
 
 // ============================================================
 // doGet
@@ -244,6 +255,15 @@ function getDetallePuesto(codigo, tipoRegistro) {
         }
       } catch (errDesc) {
         // Si no se puede leer la hoja de descripciones, continuar sin datos salariales
+      }
+
+      // Si no se encontraron datos salariales, aplicar defaults por nivel
+      if (!detalle.categoria && SALARIO_POR_NIVEL[detalle.nivel]) {
+        var sal = SALARIO_POR_NIVEL[detalle.nivel];
+        detalle.categoria  = sal.categoria;
+        detalle.contexto   = sal.contexto;
+        detalle.adicional1 = sal.adicional1;
+        detalle.adicional2 = sal.adicional2;
       }
     }
 
