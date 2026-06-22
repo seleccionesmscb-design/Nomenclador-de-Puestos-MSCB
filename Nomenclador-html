@@ -538,7 +538,7 @@ body {
       </div>
       <div class="org-container">
         <div class="org-toolbar">
-          <select id="org-filtro-sec" onchange="renderizarOrganigrama()">
+          <select id="org-filtro-sec" onchange="renderizarOrganigrama()" style="display:none">
             <option value="">Todas las Secretar&#xED;as</option>
           </select>
           <button class="header-btn" onclick="exportarOrg()" style="margin-left:auto"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar</button>
@@ -1686,7 +1686,13 @@ function renderizarOrganigrama() {
       '</div>';
   });
   html += '</div>';
-  area.innerHTML = html;
+  area.innerHTML =
+    '<div style="margin-bottom:16px">' +
+      '<button onclick="document.getElementById(\'org-filtro-sec\').value=\'\';renderizarOrganigrama()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text2)">' +
+        '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' +
+        ' Todas las secretar\xEDas' +
+      '</button>' +
+    '</div>' + html;
 }
 
 // ============================================================
