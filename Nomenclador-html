@@ -825,6 +825,7 @@ var vistaActual = 'inicio';
 var puestoDetalle = null;
 var tabDetalle = 'descripcion';
 var orgExpandido = {};
+var orgSecSeleccionada = '';
 
 // ============================================================
 // INIT
@@ -1579,13 +1580,13 @@ function toggleOrgExpand(ev, codigo) {
 }
 
 function seleccionarSecOrg(val) {
-  document.getElementById('org-filtro-sec').value = val;
+  orgSecSeleccionada = val;
   renderizarOrganigrama();
 }
 
 function renderizarOrganigrama() {
   var area = document.getElementById('org-area');
-  var filtroSecOrg = document.getElementById('org-filtro-sec').value;
+  var filtroSecOrg = orgSecSeleccionada;
 
   // Sin secretaría seleccionada: mostrar grilla centrada de secretarías
   if (!filtroSecOrg) {
@@ -1606,7 +1607,7 @@ function renderizarOrganigrama() {
       var nombre = partes[1] ? partes[1].trim() : s;
       var bg = colores[i % colores.length];
       gridHtml +=
-        '<div onclick="document.getElementById(\'org-filtro-sec\').value=\'' + esc(s) + '\';renderizarOrganigrama()" ' +
+        '<div onclick="orgSecSeleccionada=\'' + esc(s) + '\';renderizarOrganigrama()" ' +
         'style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;cursor:pointer;box-shadow:var(--sh);transition:box-shadow .15s;text-align:center" ' +
         'onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'var(--sh)\'">' +
           '<div style="width:40px;height:40px;border-radius:var(--r-sm);background:' + bg + ';display:flex;align-items:center;justify-content:center;margin:0 auto 10px">' +
@@ -1688,7 +1689,7 @@ function renderizarOrganigrama() {
   html += '</div>';
   area.innerHTML =
     '<div style="margin-bottom:16px">' +
-      '<button onclick="document.getElementById(\'org-filtro-sec\').value=\'\';renderizarOrganigrama()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text2)">' +
+      '<button onclick="orgSecSeleccionada=\'\';renderizarOrganigrama()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text2)">' +
         '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' +
         ' Todas las secretar\xEDas' +
       '</button>' +
@@ -1727,8 +1728,7 @@ function exportarOrg() {
     mostrarToast('No hay organigrama para exportar', true);
     return;
   }
-  var filtroSel = document.getElementById('org-filtro-sec');
-  var filtroLabel = filtroSel && filtroSel.value ? filtroSel.options[filtroSel.selectedIndex].text : 'Todas las Secretarías';
+  var filtroLabel = orgSecSeleccionada || 'Todas las Secretarías';
   var printDiv = document.getElementById('detalle-print');
   printDiv.innerHTML =
     '<div class="print-header">' +
