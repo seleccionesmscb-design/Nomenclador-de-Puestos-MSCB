@@ -151,6 +151,23 @@ var SECRETARIA_NOJER = {
   'DE_TUR_157':   '112 — Sec. de Turismo'
 };
 
+// Puestos transversales: se replican en todas las secretarías de planta
+var SECRETARIAS_PLANTA = [
+  '101 — Intendencia',
+  '102 — Sec. Legal y T\xE9cnica',
+  '103 — Sec. Coord. Obras y Servicios',
+  '104 — Sec. de Deportes',
+  '105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n',
+  '106 — Sec. de Hacienda',
+  '107 — Sec. Obras y Servicios P\xFAblicos',
+  '108 — Sec. Planeamiento Territorial',
+  '109 — Sec. Capital Humano y Acci\xF3n Social',
+  '110 — Sec. Producci\xF3n y Empleo',
+  '111 — Sec. Protecci\xF3n Ciudadana',
+  '112 — Sec. de Turismo'
+];
+var CODIGOS_TRANSVERSALES = ['GG_A_30', 'GSA_AG_2025'];
+
 // Niveles que NO son de planta (política/estructura) → se excluyen de la lista
 var NIVELES_EXCLUIR = ['Secretaría', 'Subsecretaría', 'Juzgado', 'Concejo',
                        'Tribunal', 'Defensoría', 'Instituto', 'Junta', 'Otro'];
@@ -269,7 +286,22 @@ function getDatosCombinados() {
         };
       });
 
-    return { ok: true, datos: datosJer.concat(datosNoJer) };
+    // Expandir puestos transversales: replicar uno por cada secretaría de planta
+    var datosNoJerExpandido = [];
+    datosNoJer.forEach(function(item) {
+      if (CODIGOS_TRANSVERSALES.indexOf(item.codigo) !== -1) {
+        SECRETARIAS_PLANTA.forEach(function(sec) {
+          var copia = {};
+          for (var k in item) copia[k] = item[k];
+          copia.secretaria = sec;
+          datosNoJerExpandido.push(copia);
+        });
+      } else {
+        datosNoJerExpandido.push(item);
+      }
+    });
+
+    return { ok: true, datos: datosJer.concat(datosNoJerExpandido) };
 
   } catch (err) {
     return { ok: false, datos: [], mensaje: err.toString() };
