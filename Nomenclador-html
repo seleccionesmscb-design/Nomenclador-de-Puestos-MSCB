@@ -960,7 +960,10 @@ function datosFiltrados() {
   return DATOS.filter(function(d){
     if (filtroNivel  && d.nivel       !== filtroNivel)  return false;
     if (filtroOrient && d.orientacion !== filtroOrient) return false;
-    if (filtroSec    && d.secretaria  !== filtroSec)    return false;
+    if (filtroSec) {
+      var esEntesAut = filtroSec === 'Entes Aut\xE1rquicos';
+      if (esEntesAut ? !!d.secretaria : d.secretaria !== filtroSec) return false;
+    }
     if (terminoBusqueda) {
       var t = terminoBusqueda.toLowerCase();
       return (d.nombreCargo || '').toLowerCase().includes(t)
