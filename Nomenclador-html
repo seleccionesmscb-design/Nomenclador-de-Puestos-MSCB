@@ -946,6 +946,11 @@ function poblarFiltroSecretarias() {
     var abrev = (partes[1] ? partes[1].trim() : s).replace('Sec. ', '').substring(0, 24);
     cont.innerHTML += '<div class="filtro-opt" data-val="' + esc(s) + '" onclick="aplicarFiltroSec(this)"><span class="fo-dot"></span> ' + abrev + '</div>';
   });
+  // Agregar Entes Aut\u00e1rquicos al final si hay puestos sin secretar\u00eda
+  var hayEntesAut = DATOS.some(function(d){ return !d.secretaria; });
+  if (hayEntesAut) {
+    cont.innerHTML += '<div class="filtro-opt" data-val="Entes Aut\xE1rquicos" onclick="aplicarFiltroSec(this)"><span class="fo-dot"></span> Entes Aut\xE1rquicos</div>';
+  }
   var orgSel = document.getElementById('org-filtro-sec');
   secs.forEach(function(s){
     var opt = document.createElement('option');
@@ -1573,11 +1578,45 @@ function toggleOrgExpand(ev, codigo) {
   renderizarOrganigrama();
 }
 
+function seleccionarSecOrg(val) {
+  document.getElementById('org-filtro-sec').value = val;
+  renderizarOrganigrama();
+}
+
 function renderizarOrganigrama() {
   var area = document.getElementById('org-area');
   var filtroSecOrg = document.getElementById('org-filtro-sec').value;
+
+  // Sin secretaría seleccionada: mostrar grilla de secretarías para elegir
+  if (!filtroSecOrg) {
+    var secsOrg = {};
+    DATOS.filter(function(d){ return d.nivel === 'Direcci\xF3n'; }).forEach(function(d){
+      var s = d.secretaria || 'Entes Aut\xE1rquicos';
+      if (!secsOrg[s]) secsOrg[s] = 0;
+      secsOrg[s]++;
+    });
+    var colores = ['#dbeafe','#ede9fe','#d1fae5','#fff7ed','#fce7f3','#fef3c7','#f0fdf4','#eff6ff'];
+    var secKeys = Object.keys(secsOrg).sort();
+    var gridHtml = '<div style="padding:8px 0 16px;color:var(--text2);font-size:13px">Seleccioná una secretaría para ver su organigrama:</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px">';
+    secKeys.forEach(function(s, i){
+      var partes = s.split('—');
+      var nombre = partes[1] ? partes[1].trim() : s;
+      var bg = colores[i % colores.length];
+      var orgVal = s === 'Entes Aut\xE1rquicos' ? '' : s;
+      gridHtml += '<div onclick="seleccionarSecOrg(\'' + esc(orgVal) + '\')" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 16px;cursor:pointer;box-shadow:var(--sh);transition:box-shadow .15s" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'var(--sh)\'">' +
+        '<div style="width:36px;height:36px;border-radius:var(--r-sm);background:' + bg + ';display:flex;align-items:center;justify-content:center;margin-bottom:10px"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">' + nombre + '</div>' +
+        '<div style="font-size:11px;color:var(--text2)">' + secsOrg[s] + ' direcci\xF3n' + (secsOrg[s] !== 1 ? 'es' : '') + '</div>' +
+      '</div>';
+    });
+    gridHtml += '</div>';
+    area.innerHTML = gridHtml;
+    return;
+  }
+
   var dirs = DATOS.filter(function(d){
-    return d.nivel === 'Direcci\xF3n' && (!filtroSecOrg || d.secretaria === filtroSecOrg);
+    return d.nivel === 'Direcci\xF3n' && d.secretaria === filtroSecOrg;
   });
   if (dirs.length === 0) {
     area.innerHTML = '<div class="empty-state"><div class="es-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="es-title">Sin datos</div></div>';
@@ -1641,7 +1680,14 @@ function renderizarOrganigrama() {
       '</div>';
   });
   html += '</div>';
-  area.innerHTML = html;
+  area.innerHTML =
+    '<div style="margin-bottom:16px">' +
+      '<button onclick="seleccionarSecOrg(\'\')" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text2)">' +
+        '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' +
+        ' Todas las secretar\xEDas' +
+      '</button>' +
+    '</div>' +
+    html;
 }
 
 // ============================================================
