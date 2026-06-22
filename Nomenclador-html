@@ -1587,9 +1587,37 @@ function renderizarOrganigrama() {
   var area = document.getElementById('org-area');
   var filtroSecOrg = document.getElementById('org-filtro-sec').value;
 
-  // Sin secretaría seleccionada: pedir que elijan una
+  // Sin secretaría seleccionada: mostrar grilla centrada de secretarías
   if (!filtroSecOrg) {
-    area.innerHTML = '<div class="empty-state"><div class="es-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></div><div class="es-title">Seleccioná una secretar\xEDa</div><div class="es-sub">Usá el men\xFA de arriba para elegir una secretar\xEDa y ver su organigrama.</div></div>';
+    var secsOrg = {};
+    DATOS.filter(function(d){ return d.nivel === 'Direcci\xF3n'; }).forEach(function(d){
+      var s = d.secretaria;
+      if (!s) return;
+      if (!secsOrg[s]) secsOrg[s] = 0;
+      secsOrg[s]++;
+    });
+    var colores = ['#dbeafe','#ede9fe','#d1fae5','#fff7ed','#fce7f3','#fef3c7','#f0fdf4','#eff6ff','#fde8d8','#e0f2fe','#f0fdf4','#fdf4ff'];
+    var secKeys = Object.keys(secsOrg).sort();
+    var gridHtml = '<div style="width:100%">' +
+      '<p style="margin:0 0 20px;color:var(--text2);font-size:13px;text-align:center">Seleccion\xE1 una secretar\xEDa para ver su organigrama</p>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;width:100%">';
+    secKeys.forEach(function(s, i){
+      var partes = s.split('—');
+      var nombre = partes[1] ? partes[1].trim() : s;
+      var bg = colores[i % colores.length];
+      gridHtml +=
+        '<div onclick="document.getElementById(\'org-filtro-sec\').value=\'' + esc(s) + '\';renderizarOrganigrama()" ' +
+        'style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;cursor:pointer;box-shadow:var(--sh);transition:box-shadow .15s;text-align:center" ' +
+        'onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,.12)\'" onmouseout="this.style.boxShadow=\'var(--sh)\'">' +
+          '<div style="width:40px;height:40px;border-radius:var(--r-sm);background:' + bg + ';display:flex;align-items:center;justify-content:center;margin:0 auto 10px">' +
+            '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg>' +
+          '</div>' +
+          '<div style="font-size:12px;font-weight:700;color:var(--navy);line-height:1.3">' + nombre + '</div>' +
+          '<div style="font-size:11px;color:var(--text2);margin-top:4px">' + secsOrg[s] + ' direcci\xF3n' + (secsOrg[s] !== 1 ? 'es' : '') + '</div>' +
+        '</div>';
+    });
+    gridHtml += '</div></div>';
+    area.innerHTML = gridHtml;
     return;
   }
 
