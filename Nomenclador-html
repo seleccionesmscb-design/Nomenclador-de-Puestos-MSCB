@@ -2157,6 +2157,49 @@ function toggleOrgPuestos(forzar) {
   sidebar.classList.toggle('visible');
 }
 
+// Hijos DIRECTOS de una unidad: las unidades cuyo código tiene a esta como prefijo
+// y no existe ningún ancestro intermedio (prefijo más largo) entre ambas.
+function hijosDirectosOrg(unit, unidades) {
+  var cod = String(unit.codigo);
+  return unidades.filter(function(c){
+    var cc = String(c.codigo);
+    if (cc === cod || cc.indexOf(cod) !== 0) return false;
+    return !unidades.some(function(z){
+      var zc = String(z.codigo);
+      return zc !== cod && zc !== cc
+        && cc.indexOf(zc) === 0 && zc.indexOf(cod) === 0
+        && zc.length > cod.length && zc.length < cc.length;
+    });
+  }).sort(function(a,b){ return String(a.codigo).localeCompare(String(b.codigo)); });
+}
+
+// Render recursivo de un nodo del organigrama con sus descendientes anidados
+function nodoOrgHtml(unit, unidades) {
+  var esDir  = unit.nivel === 'Direcci\xF3n';
+  var clase  = esDir ? 'direccion' : 'jefatura';
+  var nombre = (unit.nombreCargo || '');
+  if (esDir) nombre = nombre.replace('Direcci\xF3n de ', 'Dir. de ');
+  var nodoStyle = esDir ? '' : ' style="min-width:104px;max-width:148px"';
+  var nodo = '<div id="org-node-' + esc(unit.codigo) + '" class="org-node ' + clase + '" onclick="abrirDetalle(\'' + esc(unit.codigo) + '\')" title="' + (unit.nombreCargo || '') + '"' + nodoStyle + '>' +
+      (esDir ? '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/></svg></span>' : '') +
+      '<div class="on-nombre"' + (esDir ? '' : ' style="font-size:10px"') + '>' + nombre.substring(0, 30) + '</div>' +
+      '<div class="on-codigo">' + (unit.codigo || '') + '</div>' +
+    '</div>';
+
+  var hijos = hijosDirectosOrg(unit, unidades);
+  if (hijos.length === 0) return nodo;
+
+  var mostrar = orgExpandido[unit.codigo] ? hijos : hijos.slice(0, 8);
+  var childrenHtml = mostrar.map(function(h){
+    return '<div class="org-child"><div class="org-stem-v"></div>' + nodoOrgHtml(h, unidades) + '</div>';
+  }).join('');
+  if (!orgExpandido[unit.codigo] && hijos.length > 8) {
+    childrenHtml += '<div class="org-child"><div class="org-stem-v"></div>' +
+      '<div class="org-node jefatura" onclick="toggleOrgExpand(event,\'' + esc(unit.codigo) + '\')" style="font-size:10px;color:var(--accent);font-weight:700;cursor:pointer">+' + (hijos.length - 8) + ' m\xE1s</div></div>';
+  }
+  return nodo + '<div class="org-stem-down"></div><div class="org-children">' + childrenHtml + '</div>';
+}
+
 function renderizarOrganigrama() {
   var area = document.getElementById('org-area');
   var filtroSecOrg = orgSecSeleccionada;
@@ -2213,6 +2256,10 @@ function renderizarOrganigrama() {
     var partes = s.split('\u2014');
     var nombre = partes[1] ? partes[1].trim() : s;
     var cod    = partes[0].trim();
+    var unidadesSec = DATOS.filter(function(u){
+      return u.tipoRegistro !== 'nojerarquico' && u.secretaria === s
+        && (u.nivel === 'Direcci\xF3n' || u.nivel === 'Departamento' || u.nivel === 'Divisi\xF3n' || u.nivel === 'Secci\xF3n');
+    });
     html += '<div style="display:flex;flex-direction:column;align-items:center">' +
         '<div class="org-node secretaria" style="min-width:180px;max-width:220px">' +
           '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span>' +
@@ -2222,39 +2269,9 @@ function renderizarOrganigrama() {
       '<div class="org-stem-down"></div>' +
       '<div class="org-children">' +
         grupos[s].map(function(d){
-          var subdeps = DATOS.filter(function(sub){
-            return (sub.secretaria === d.secretaria)
-              && (sub.nivel === 'Departamento' || sub.nivel === 'Divisi\xF3n')
-              && String(sub.codigo).startsWith(String(d.codigo).substring(0, 10));
-          });
-          return '<div class="org-child">' +
-            '<div class="org-stem-v"></div>' +
-            '<div id="org-node-' + esc(d.codigo) + '" class="org-node direccion" onclick="abrirDetalle(\'' + esc(d.codigo) + '\')" title="' + (d.nombreCargo || '') + '">' +
-              '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/></svg></span>' +
-              '<div class="on-nombre">' + (d.nombreCargo || '').replace('Direcci\xF3n de ', 'Dir. de ').substring(0, 24) + '</div>' +
-              '<div class="on-codigo">' + (d.codigo || '') + '</div>' +
-            '</div>' +
-            (subdeps.length > 0 ?
-              '<div class="org-stem-down"></div>' +
-              '<div class="org-children">' +
-                (orgExpandido[d.codigo] ? subdeps : subdeps.slice(0, 4)).map(function(sub){
-                  return '<div class="org-child">' +
-                    '<div class="org-stem-v"></div>' +
-                    '<div id="org-node-' + esc(sub.codigo) + '" class="org-node jefatura" onclick="abrirDetalle(\'' + esc(sub.codigo) + '\')" title="' + (sub.nombreCargo || '') + '" style="min-width:96px;max-width:124px">' +
-                      '<div class="on-nombre" style="font-size:10px">' + (sub.nombreCargo || '').substring(0, 22) + '</div>' +
-                      '<div class="on-codigo">' + (sub.codigo || '') + '</div>' +
-                    '</div>' +
-                  '</div>';
-                }).join('') +
-                (!orgExpandido[d.codigo] && subdeps.length > 4 ?
-                  '<div class="org-child">' +
-                    '<div class="org-stem-v"></div>' +
-                    '<div class="org-node jefatura" onclick="toggleOrgExpand(event,\'' + esc(d.codigo) + '\')" style="font-size:10px;color:var(--accent);font-weight:700">+' + (subdeps.length - 4) + ' m\xE1s</div>' +
-                  '</div>'
-                : '') +
-              '</div>'
-            : '') +
-            '</div>';
+          return '<div class="org-child"><div class="org-stem-v"></div>' +
+            nodoOrgHtml(d, unidadesSec) +
+          '</div>';
         }).join('') +
       '</div>' +
       '</div>';
