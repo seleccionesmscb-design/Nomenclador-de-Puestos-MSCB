@@ -2,18 +2,186 @@
 // CONFIGURACIÓN
 // ============================================================
 
-var SPREADSHEET_ID_NOMENCLADOR = '16r3ZmX5rI5e6tnYyOz8e5NW6ewe7bn_vFEdyjU9Nx6Q';
+var SPREADSHEET_ID_NOMENCLADOR  = '16r3ZmX5rI5e6tnYyOz8e5NW6ewe7bn_vFEdyjU9Nx6Q';
+var SPREADSHEET_ID_DESCRIPCIONES = '1en3YVHwGMHRW9uOItAKtH1ezuU4Y4NQvZZ3UFvtvJt8';
 
 var HOJA_BD_NOM     = 'BD_Nomenclador';
 var HOJA_25_PUESTOS = '25 Puestos';
 var HOJA_NO_JER     = 'BD_Puestos_NoJerarquicos';
+var HOJA_BD_PUESTOS = 'BD_Puestos';
 
 // Fila 1 = título, fila 2 = headers, fila 3 = primera fila de datos
 var FILA_DATA_INICIO = 3;
 
+// Asignación manual de secretaría para puestos no jerárquicos sin secretaría en la planilla
+var SECRETARIA_NOJER = {
+  'GG_HT_23':     '106 — Sec. de Hacienda',
+  'GG_HCOM_39':   '106 — Sec. de Hacienda',
+  'GG_HC_39':     '106 — Sec. de Hacienda',
+  'GG_HC_36':     '106 — Sec. de Hacienda',
+  'GG_HFyT_32':   '106 — Sec. de Hacienda',
+  'GG_A_20':      '106 — Sec. de Hacienda',
+  'MC_MC_201':    '106 — Sec. de Hacienda',
+  'JG_PCG_04':    '101 — Intendencia',
+  'JG_PCG_01':    '101 — Intendencia',
+  'JG_PCG_02':    '101 — Intendencia',
+  'JG_PCG_03':    '101 — Intendencia',
+  'JG_RRHH_16':   '101 — Intendencia',
+  'JG_RRHH_05':   '101 — Intendencia',
+  'JG_RRHH_01':   '101 — Intendencia',
+  'JG_RRHH_02':   '101 — Intendencia',
+  'JG_RRHH_03':   '101 — Intendencia',
+  'JG_RRHH_17':   '101 — Intendencia',
+  'GG_HS_30':     '101 — Intendencia',
+  'GG_A_21':      '101 — Intendencia',
+  'GG_TFM_46':    '101 — Intendencia',
+  'GG_TFM_47':    '101 — Intendencia',
+  'JG_MAY_03':    '101 — Intendencia',
+  'SP_CHVL_123':  '101 — Intendencia',
+  'SP_CH_125':    '101 — Intendencia',
+  'SP_CHVP_124':  '101 — Intendencia',
+  'SP_SAN_122':   '101 — Intendencia',
+  'JG_TyT_23':    '101 — Intendencia',
+  'JG_SL_02':     '101 — Intendencia',
+  'JG_SL_03':     '101 — Intendencia',
+  'JG_SL_04':     '101 — Intendencia',
+  'JG_SL_05':     '101 — Intendencia',
+  'JG_SL_06':     '101 — Intendencia',
+  'JG_SL_07':     '101 — Intendencia',
+  'JG_COM_01':    '101 — Intendencia',
+  'JG_COM_02':    '101 — Intendencia',
+  'JG_COM_03':    '101 — Intendencia',
+  'JG_COM_04':    '101 — Intendencia',
+  'JG_COM_05':    '101 — Intendencia',
+  'JG_DS_01':     '101 — Intendencia',
+  'JG_DS_02':     '101 — Intendencia',
+  'JG_DS_03':     '101 — Intendencia',
+  'TyV_148':      '101 — Intendencia',
+  'SP_MANT_103':  '103 — Sec. Coord. Obras y Servicios',
+  'SP_MANT_104':  '103 — Sec. Coord. Obras y Servicios',
+  'SP_MANT_105':  '103 — Sec. Coord. Obras y Servicios',
+  'SP_MANT_106':  '103 — Sec. Coord. Obras y Servicios',
+  'SP_MP_122':    '103 — Sec. Coord. Obras y Servicios',
+  'SP_PBACH_127': '103 — Sec. Coord. Obras y Servicios',
+  'SP_PMG_128':   '103 — Sec. Coord. Obras y Servicios',
+  'SP_CEM_118':   '103 — Sec. Coord. Obras y Servicios',
+  'SP_PG_127':    '103 — Sec. Coord. Obras y Servicios',
+  'DS_CUL_97':    '104 — Sec. de Deportes',
+  'DS_CUL_99':    '104 — Sec. de Deportes',
+  'DS_CUL_93':    '104 — Sec. de Deportes',
+  'DS_CUL_95':    '104 — Sec. de Deportes',
+  'DS_CUL_100':   '104 — Sec. de Deportes',
+  'DS_Dep_87':    '104 — Sec. de Deportes',
+  'DS_Dep_89':    '104 — Sec. de Deportes',
+  'DSES_CU_3':    '104 — Sec. de Deportes',
+  'DSES_CU_2':    '104 — Sec. de Deportes',
+  'JG_DS_09':     '105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n',
+  'JG_DS_10':     '105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n',
+  'JG_DS_11':     '105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n',
+  'JG_DS_17':     '105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n',
+  'SP_Mec_107':   '107 — Sec. Obras y Servicios P\xFAblicos',
+  'SP_Mec_109':   '107 — Sec. Obras y Servicios P\xFAblicos',
+  'SP_PyJ_113':   '107 — Sec. Obras y Servicios P\xFAblicos',
+  'SP_PyJ_114':   '107 — Sec. Obras y Servicios P\xFAblicos',
+  'SP_PyJ_116':   '107 — Sec. Obras y Servicios P\xFAblicos',
+  'OSP_MI_183':   '107 — Sec. Obras y Servicios P\xFAblicos',
+  'JG_CRUB_152':  '107 — Sec. Obras y Servicios P\xFAblicos',
+  'JG_CRUB_153':  '107 — Sec. Obras y Servicios P\xFAblicos',
+  'SP_Reco_117':  '107 — Sec. Obras y Servicios P\xFAblicos',
+  'SUB_CAT_139':  '108 — Sec. Planeamiento Territorial',
+  'SUB_MA_4':     '108 — Sec. Planeamiento Territorial',
+  'SUB_MA_5':     '108 — Sec. Planeamiento Territorial',
+  'SUB_MA_6':     '108 — Sec. Planeamiento Territorial',
+  'SUB_MA_7':     '108 — Sec. Planeamiento Territorial',
+  'SUB_MA_8':     '108 — Sec. Planeamiento Territorial',
+  'SUB_MA_13':    '108 — Sec. Planeamiento Territorial',
+  'SUB_PLA_130':  '108 — Sec. Planeamiento Territorial',
+  'SUB_PLA_131':  '108 — Sec. Planeamiento Territorial',
+  'SUB_PLA_132':  '108 — Sec. Planeamiento Territorial',
+  'SUB_PLA_133':  '108 — Sec. Planeamiento Territorial',
+  'SUB_PLA_134':  '108 — Sec. Planeamiento Territorial',
+  'SUB_PLA_136':  '108 — Sec. Planeamiento Territorial',
+  'SP_OXC_112':   '108 — Sec. Planeamiento Territorial',
+  'DS_INST_28':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'DS_INST_17':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'DS_INST_18':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'DS_INST_19':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'DS_INST_23':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'DS_INST_20':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'DS_SOC_28':    '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_69':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_70':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_71':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_72':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_73':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_75':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_78':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_79':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_80':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'Dsocial_82':   '109 — Sec. Capital Humano y Acci\xF3n Social',
+  'DSocial_76':   '110 — Sec. Producci\xF3n y Empleo',
+  'DE_T_63':      '110 — Sec. Producci\xF3n y Empleo',
+  'DE_T_64':      '110 — Sec. Producci\xF3n y Empleo',
+  'DE_T_65':      '110 — Sec. Producci\xF3n y Empleo',
+  'DE_T_66':      '110 — Sec. Producci\xF3n y Empleo',
+  'DE_T_68':      '110 — Sec. Producci\xF3n y Empleo',
+  'DE_T_71':      '110 — Sec. Producci\xF3n y Empleo',
+  'DE_T_72':      '110 — Sec. Producci\xF3n y Empleo',
+  'DE_TR_165':    '110 — Sec. Producci\xF3n y Empleo',
+  'JG_OMIDUC_07': '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_OMIDUC_08': '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_OMIDUC_01': '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_VZ_155':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_VZ_156':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_VZ_159':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_VZ_160':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_HAB_01':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_LB_04':     '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_LB_06':     '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_TyT_02':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_TyT_07':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_TyT_12':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_TyT_21':    '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_SC_04':     '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_SC_05':     '111 — Sec. Protecci\xF3n Ciudadana',
+  'JG_SC_06':     '111 — Sec. Protecci\xF3n Ciudadana',
+  'Educaci\xF3n vial': '111 — Sec. Protecci\xF3n Ciudadana',
+  'DE_TUR_49':    '112 — Sec. de Turismo',
+  'DE_TUR_156':   '112 — Sec. de Turismo',
+  'DE_TUR_157':   '112 — Sec. de Turismo'
+};
+
+// Puestos transversales: se replican en todas las secretarías de planta
+var SECRETARIAS_PLANTA = [
+  '101 — Intendencia',
+  '102 — Sec. Legal y T\xE9cnica',
+  '103 — Sec. Coord. Obras y Servicios',
+  '104 — Sec. de Deportes',
+  '105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n',
+  '106 — Sec. de Hacienda',
+  '107 — Sec. Obras y Servicios P\xFAblicos',
+  '108 — Sec. Planeamiento Territorial',
+  '109 — Sec. Capital Humano y Acci\xF3n Social',
+  '110 — Sec. Producci\xF3n y Empleo',
+  '111 — Sec. Protecci\xF3n Ciudadana',
+  '112 — Sec. de Turismo'
+];
+var CODIGOS_TRANSVERSALES = ['GG_A_30', 'GSA_AG_2025'];
+
 // Niveles que NO son de planta (política/estructura) → se excluyen de la lista
 var NIVELES_EXCLUIR = ['Secretaría', 'Subsecretaría', 'Juzgado', 'Concejo',
                        'Tribunal', 'Defensoría', 'Instituto', 'Junta', 'Otro'];
+
+// Datos salariales por nivel (fuente: Tabla_nombre_puestoperfiles_categorias)
+var SALARIO_POR_NIVEL = {
+  'Dirección':         { categoria: '23', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Dirección General': { categoria: '23', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Dirección Técnica Contable': { categoria: '23', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Delegación':        { categoria: '23', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Departamento':      { categoria: '21', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'División':          { categoria: '19', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' },
+  'Sección':           { categoria: '16', contexto: 'a.1. Cubierto y calefaccionado (0%)', adicional1: 'ADIC. RESPONSABILIDAD JERARQ', adicional2: '' }
+};
 
 
 // ============================================================
@@ -95,19 +263,21 @@ function getDatosCombinados() {
         return String(f[0] || '').trim() !== '' && String(f[1] || '').trim() !== '';
       })
       .map(function(f) {
-        var tipo = String(f[2] || '').trim();
+        var tipo   = String(f[2] || '').trim();
+        var codigo = String(f[0] || '').trim();
+        var sec    = String(f[8] || '').trim() || SECRETARIA_NOJER[codigo] || '';
         return {
           tipoRegistro:      'nojerarquico',
-          codigo:            String(f[0] || '').trim(),
-          nivel:             'No jerárquico',
+          codigo:            codigo,
+          nivel:             'No jer\xE1rquico',
           nombreCargo:       String(f[1] || '').trim(),
           tipoPuesto:        tipo,
           codigoPuesto:      '',
           orientacion:       orientacionDesdeTipo_(tipo),
-          secretaria:        String(f[8] || '').trim(), // dependencia directa como referencia
-          misionGenerica:    '',   // se carga solo en el detalle
+          secretaria:        sec,
+          misionGenerica:    '',
           misionEspecifica:  String(f[9] || '').trim(),
-          requiereTitulo:    String(f[3] || '').trim() !== '' ? 'Sí' : 'No',
+          requiereTitulo:    String(f[3] || '').trim() !== '' ? 'S\xED' : 'No',
           requiereMatricula: 'No',
           normativa:         '',
           categoria:         String(f[4] || '').trim(),
@@ -116,7 +286,22 @@ function getDatosCombinados() {
         };
       });
 
-    return { ok: true, datos: datosJer.concat(datosNoJer) };
+    // Expandir puestos transversales: replicar uno por cada secretaría de planta
+    var datosNoJerExpandido = [];
+    datosNoJer.forEach(function(item) {
+      if (CODIGOS_TRANSVERSALES.indexOf(item.codigo) !== -1) {
+        SECRETARIAS_PLANTA.forEach(function(sec) {
+          var copia = {};
+          for (var k in item) copia[k] = item[k];
+          copia.secretaria = sec;
+          datosNoJerExpandido.push(copia);
+        });
+      } else {
+        datosNoJerExpandido.push(item);
+      }
+    });
+
+    return { ok: true, datos: datosJer.concat(datosNoJerExpandido) };
 
   } catch (err) {
     return { ok: false, datos: [], mensaje: err.toString() };
@@ -161,8 +346,8 @@ function getDetallePuesto(codigo, tipoRegistro) {
         tipoPuesto:            tipoPuesto,
         codigoPuesto:          '',
         orientacion:           orientacionDesdeTipo_(tipoPuesto),
-        secretaria:            '',
-        dependencia:           String(filaCargo[8] || '').trim(),
+        secretaria:            String(filaCargo[8] || '').trim() || SECRETARIA_NOJER[String(filaCargo[0] || '').trim()] || '',
+        dependencia:           String(filaCargo[9] || '').trim(),
         misionEspecifica:      String(filaCargo[9] || '').trim(),
         requisitosEspecificos: '',
         titulacion:            String(filaCargo[3] || '').trim(),
@@ -213,8 +398,8 @@ function getDetallePuesto(codigo, tipoRegistro) {
         requiereMatricula:     String(filaCargo[12] || '').trim(),
         categoria:             '',
         contexto:              '',
-        adicional1:              '',
-        adicional2:              '',
+        adicional1:            '',
+        adicional2:            '',
         normativa:               String(filaCargo[13] || '').trim(),
         competenciasPrincipales: String(filaCargo[14] || '').trim(),
         competenciasSecundarias: String(filaCargo[15] || '').trim(),
@@ -222,6 +407,36 @@ function getDetallePuesto(codigo, tipoRegistro) {
         responsabilidades:       String(filaCargo[17] || '').trim(),
         puestoGenerico:          null
       };
+
+      // Enriquecer con datos salariales desde "base de datos descripciones"
+      try {
+        var ssDesc = SpreadsheetApp.openById(SPREADSHEET_ID_DESCRIPCIONES);
+        var hojaDesc = ssDesc.getSheetByName(HOJA_BD_PUESTOS);
+        if (hojaDesc) {
+          var valDesc = hojaDesc.getDataRange().getValues();
+          var codigoBuscar = String(filaCargo[0]).trim();
+          for (var d = 1; d < valDesc.length; d++) {
+            if (String(valDesc[d][0] || '').trim() === codigoBuscar) {
+              detalle.categoria  = String(valDesc[d][7]  || '').trim();
+              detalle.contexto   = String(valDesc[d][8]  || '').trim();
+              detalle.adicional1 = String(valDesc[d][9]  || '').trim();
+              detalle.adicional2 = String(valDesc[d][10] || '').trim();
+              break;
+            }
+          }
+        }
+      } catch (errDesc) {
+        // Si no se puede leer la hoja de descripciones, continuar sin datos salariales
+      }
+
+      // Si no se encontraron datos salariales, aplicar defaults por nivel
+      if (!detalle.categoria && SALARIO_POR_NIVEL[detalle.nivel]) {
+        var sal = SALARIO_POR_NIVEL[detalle.nivel];
+        detalle.categoria  = sal.categoria;
+        detalle.contexto   = sal.contexto;
+        detalle.adicional1 = sal.adicional1;
+        detalle.adicional2 = sal.adicional2;
+      }
     }
 
     // ── Buscar descripción genérica del puesto en "25 Puestos" ──
