@@ -286,8 +286,8 @@ body {
 .org-toolbar { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
 .org-toolbar select { border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 6px 10px; font-size: 12px; font-family: Segoe UI, Arial, sans-serif; color: var(--text); outline: none; cursor: pointer; }
 .org-layout { display: flex; gap: 0; }
-.org-area { min-height: 500px; padding: 32px; overflow-x: auto; display: flex; justify-content: flex-start; align-items: flex-start; flex: 1; }
-.org-sidebar { width: 260px; min-width: 260px; border-left: 1px solid var(--border); background: var(--surface); overflow-y: auto; max-height: 70vh; display: none; }
+.org-area { min-height: 500px; padding: 32px; overflow-x: auto; display: flex; justify-content: flex-start; align-items: flex-start; flex: 1; min-width: 0; }
+.org-sidebar { width: 260px; min-width: 260px; border-left: 1px solid var(--border); background: var(--surface); overflow-y: auto; display: none; align-self: stretch; }
 .org-sidebar.visible { display: block; }
 .org-sidebar-header { padding: 12px 14px; font-size: 11px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); background: var(--surface2); position: sticky; top: 0; }
 .org-sidebar-item { padding: 7px 14px; font-size: 11.5px; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; transition: background .12s; }
@@ -824,7 +824,7 @@ body {
         <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div id="org-loc-body" style="overflow:auto;flex:1;padding:28px 32px;display:flex;justify-content:flex-start;align-items:flex-start"></div>
+    <div id="org-loc-body" style="overflow:auto;flex:1;padding:28px 32px;display:flex;flex-direction:column;justify-content:center;align-items:center"></div>
   </div>
 </div>
 
@@ -1242,9 +1242,7 @@ function renderizarTabDetalle(tab) {
     }
 
     // Ubicación — detectar si el puesto existe en múltiples áreas
-    var otrasInstancias = d.tipoRegistro === 'nojerarquico'
-      ? DATOS.filter(function(r){ return r.tipoRegistro === 'nojerarquico' && r.nombreCargo === d.nombreCargo && r.codigo !== d.codigo; })
-      : [];
+    var otrasInstancias = DATOS.filter(function(r){ return r.tipoRegistro === 'nojerarquico' && r.nombreCargo === d.nombreCargo && r.codigo !== d.codigo; });
 
     var btnOrg = '';
     if (otrasInstancias.length > 0) {
@@ -1961,10 +1959,11 @@ function irAOrganigrama() {
     }
 
     html += '<div class="org-stem-down"></div>' +
-      '<div id="orgloc-node-' + esc(codigoTarget) + '" class="org-node jefatura destacado" style="min-width:180px;max-width:260px;cursor:default">' +
-        '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin-bottom:4px">' + (d.tipoPuesto || 'No Jer\xE1rquico') + '</div>' +
-        '<div class="on-nombre" style="font-size:12px">' + (d.nombreCargo || '') + '</div>' +
-        '<div class="on-codigo">' + codigoTarget + '</div>' +
+      '<div id="orgloc-node-' + esc(codigoTarget) + '" style="position:relative;min-width:160px;max-width:240px;cursor:default;background:#1d4ed8;border:2px solid #1e40af;border-radius:var(--r);padding:10px 14px;text-align:center;box-shadow:0 4px 18px rgba(29,78,216,.5)">' +
+        '<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#1d4ed8;border:1px solid #60a5fa;border-radius:20px;padding:1px 8px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#bfdbfe;white-space:nowrap">&#x1F4CC; ESTE PUESTO</div>' +
+        '<div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#93c5fd;margin-bottom:4px">' + (d.tipoPuesto || 'No Jer\xE1rquico') + '</div>' +
+        '<div style="font-size:12px;font-weight:700;color:#fff;line-height:1.3">' + (d.nombreCargo || '') + '</div>' +
+        '<div style="font-size:9px;color:#93c5fd;margin-top:3px">' + codigoTarget + '</div>' +
       '</div>';
 
     html += '</div>';
@@ -2074,9 +2073,8 @@ function irAOrganigrama() {
   }
 
   // Si el puesto está en múltiples áreas, mostrar listado al inicio
-  var otrasInstancias = d.tipoRegistro === 'nojerarquico'
-    ? DATOS.filter(function(r){ return r.tipoRegistro === 'nojerarquico' && r.nombreCargo === d.nombreCargo && r.codigo !== d.codigo; })
-    : [];
+  // detect multi-area regardless of server tipoRegistro field
+  var otrasInstancias = DATOS.filter(function(r){ return r.tipoRegistro === 'nojerarquico' && r.nombreCargo === d.nombreCargo && r.codigo !== d.codigo; });
   
   if (otrasInstancias.length > 0) {
     var todasInstancias = [d].concat(otrasInstancias);
