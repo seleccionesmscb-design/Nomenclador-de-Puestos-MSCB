@@ -1637,39 +1637,45 @@ function renderizarAdicionales() {
 // ============================================================
 // CATEGORÍAS ESCALAFÓN
 // ============================================================
+function toggleTablaReq() {
+  var el  = document.getElementById('catesc-tabla-req');
+  var btn = document.getElementById('catesc-tabla-btn');
+  if (!el) return;
+  var abierto = el.style.display !== 'none';
+  el.style.display = abierto ? 'none' : '';
+  btn.textContent  = abierto ? '▼' : '▲';
+}
+
 function renderizarCatEscalafon() {
   var cont = document.getElementById('catescalafon-content');
   if (!cont) return;
 
-  // Panel desplegable con tabla de requisitos por categoría
   var REQUISITOS_CAT = [
     { cat: '8',  desc: 'No requieren secundario de forma excluyente.' },
-    { cat: '10', desc: 'No requieren secundario. Requieren conocimientos específicos básicos para la ejecución de tareas, o implican abordaje de situaciones sociales complejas.' },
+    { cat: '10', desc: 'No requieren secundario. Requieren conocimientos espec\xEDficos b\xE1sicos para la ejecuci\xF3n de tareas, o implican abordaje de situaciones sociales complejas.' },
     { cat: '12', desc: 'Secundario completo (como requisito excluyente).' },
-    { cat: '14', desc: 'Secundario completo excluyente, sumado a Oficiales de oficios técnicos con suficiente experticia/idoneidad, o abordaje de situaciones sociales complejas.' },
-    { cat: '16', desc: 'Jefaturas de sección, o coordinaciones/supervisiones/lideran personal aún sin puesto jerárquico.' },
-    { cat: '17', desc: 'Formación de pregrado, educación superior no universitaria excluyente.' },
-    { cat: '19', desc: 'Formación de grado (Universitario) excluyente — Divisiones.' },
+    { cat: '14', desc: 'Secundario completo excluyente, sumado a Oficiales de oficios t\xE9cnicos con suficiente experticia/idoneidad, o abordaje de situaciones sociales complejas.' },
+    { cat: '16', desc: 'Jefaturas de secci\xF3n, o coordinaciones/supervisiones/lideran personal a\xFAn sin puesto jer\xE1rquico.' },
+    { cat: '17', desc: 'Formaci\xF3n de pregrado, educaci\xF3n superior no universitaria excluyente.' },
+    { cat: '19', desc: 'Formaci\xF3n de grado (Universitario) excluyente — Divisiones.' },
     { cat: '21', desc: 'Jefaturas de Departamento.' },
-    { cat: '23', desc: 'Direcciones.' }
+    { cat: '23', desc: 'Direcci\xF3n.' }
   ];
 
-  var tablaId = 'catesc-tabla-req';
   var tablaHtml =
     '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--sh)">' +
-      '<div onclick="(function(){ var el=document.getElementById('' + tablaId + ''); var btn=document.getElementById('' + tablaId + '-btn'); var abierto=el.style.display!=='none'; el.style.display=abierto?'none':''; btn.innerHTML=abierto?'&#x25BC;':'&#x25B2;'; })()" ' +
-        'style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#f0f7ff;border-bottom:1px solid var(--border)">' +
+      '<div onclick="toggleTablaReq()" style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#f0f7ff;border-bottom:1px solid var(--border)">' +
         '<div style="display:flex;align-items:center;gap:10px">' +
           '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>' +
-          '<span style="font-size:13px;font-weight:700;color:var(--navy)">Tabla de requisitos del perfil por categoría</span>' +
+          '<span style="font-size:13px;font-weight:700;color:var(--navy)">Tabla de requisitos del perfil por categor\xEDa</span>' +
         '</div>' +
-        '<span id="' + tablaId + '-btn" style="font-size:12px;color:var(--text2)">&#x25BC;</span>' +
+        '<span id="catesc-tabla-btn" style="font-size:12px;color:var(--text2)">▼</span>' +
       '</div>' +
-      '<div id="' + tablaId + '">' +
+      '<div id="catesc-tabla-req">' +
         '<table style="width:100%;border-collapse:collapse">' +
           '<thead><tr style="background:#e8f0fe">' +
             '<th style="padding:8px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--border)">Requisitos objetivos del perfil</th>' +
-            '<th style="padding:8px 16px;text-align:center;font-size:11px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--border);width:120px">Categoría</th>' +
+            '<th style="padding:8px 16px;text-align:center;font-size:11px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--border);width:120px">Categor\xEDa</th>' +
           '</tr></thead>' +
           '<tbody>' +
             REQUISITOS_CAT.map(function(r, i) {
@@ -1696,10 +1702,7 @@ function renderizarCatEscalafon() {
   var keys = Object.keys(mapa).sort(function(a, b) {
     return (parseInt(a) || 0) - (parseInt(b) || 0);
   });
-  if (keys.length === 0) {
-    cont.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:32px;box-shadow:var(--sh)"><div class="empty-state"><div class="es-title">Sin categorías registradas</div><div class="es-sub">No se encontraron categorías salariales en los datos actuales.</div></div></div>';
-    return;
-  }
+  if (keys.length === 0) return;
   var COLORS = ['#dbeafe','#ede9fe','#d1fae5','#fff7ed','#fce7f3','#fef3c7','#f0fdf4','#eff6ff'];
   cont.innerHTML += keys.map(function(k, idx) {
     var puestos = mapa[k];
