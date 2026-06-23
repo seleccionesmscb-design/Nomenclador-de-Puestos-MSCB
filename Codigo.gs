@@ -503,6 +503,37 @@ function getDetallePuesto(codigo, tipoRegistro) {
 
 
 // ============================================================
+// DEBUG: columnas raw de un puesto no jerárquico
+// ============================================================
+
+function debugNoJerColumnas(codigo) {
+  try {
+    var ss     = SpreadsheetApp.openById(SPREADSHEET_ID_NOMENCLADOR);
+    var hoja   = ss.getSheetByName(HOJA_NO_JER);
+    if (!hoja) return { ok: false, msg: 'Hoja no encontrada' };
+    var vals   = hoja.getDataRange().getValues();
+    // fila 0 = titulo, fila 1 = headers, fila 2+ = datos
+    var headers = vals[1] || [];
+    for (var i = FILA_DATA_INICIO - 1; i < vals.length; i++) {
+      if (String(vals[i][0] || '').trim() === codigo) {
+        var row = vals[i];
+        var resultado = { headers: {}, valores: {} };
+        for (var c = 0; c < row.length; c++) {
+          var h = headers[c] ? String(headers[c]).trim() : '(sin header)';
+          resultado.headers['f[' + c + ']'] = h;
+          resultado.valores['f[' + c + ']'] = String(row[c] || '');
+        }
+        return { ok: true, fila: i + 1, resultado: resultado };
+      }
+    }
+    return { ok: false, msg: 'Codigo no encontrado: ' + codigo };
+  } catch (e) {
+    return { ok: false, msg: e.toString() };
+  }
+}
+
+
+// ============================================================
 // HELPER: orientación desde tipoPuesto (para no jerárquicos)
 // ============================================================
 
