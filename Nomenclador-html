@@ -1574,7 +1574,12 @@ function toggleBloque(id) {
 function toggleSubOrient(id) {
   var el = document.getElementById(id);
   if (!el) return;
-  el.style.display = el.style.display === 'none' ? '' : 'none';
+  var isHidden = el.style.display === 'none' || el.style.display === '';
+  el.style.display = isHidden ? 'flex' : 'none';
+  el.style.flexDirection = 'column';
+  el.style.gap = '4px';
+  var chevron = document.getElementById(id + '-chevron');
+  if (chevron) chevron.style.transform = isHidden ? 'rotate(180deg)' : '';
 }
 
 function renderizarCategorias() {
@@ -1597,14 +1602,27 @@ function renderizarCategorias() {
   html += '<span style="font-size:13px;font-weight:700;color:var(--navy)">Ejes (Secretar\xEDas y Direcciones)</span></div>';
   html += '<span id="cat-ejes-btn" style="font-size:12px;color:var(--text2)">▲</span></div>';
   html += '<div id="cat-ejes" style="padding:12px 16px;display:flex;flex-direction:column;gap:6px">';
-  secKeys.forEach(function(s){
+  secKeys.forEach(function(s, si){
     var partes = s.split('—');
     var nombre = partes[1] ? partes[1].trim() : s;
     var dirs   = secsMap[s];
-    html += '<div style="padding:8px 12px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:space-between">';
+    var subId  = 'cat-sec-' + si;
+    html += '<div style="border-bottom:1px solid var(--border)">';
+    html += '<div onclick="toggleSubOrient(\'' + subId + '\')" style="padding:8px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .12s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'">';
     html += '<span style="font-size:12.5px;font-weight:600;color:var(--navy)">' + nombre + '</span>';
+    html += '<div style="display:flex;align-items:center;gap:6px">';
     html += '<span style="font-size:10px;color:var(--text3)">' + dirs.length + ' direcci\xF3n' + (dirs.length !== 1 ? 'es' : '') + '</span>';
-    html += '</div>';
+    html += '<svg id="' + subId + '-chevron" style="width:12px;height:12px;transition:transform .2s;color:var(--text3)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+    html += '</div></div>';
+    html += '<div id="' + subId + '" style="display:none;padding:0 12px 8px 24px">';
+    dirs.sort(function(a,b){ return (a.nombreCargo||'').localeCompare(b.nombreCargo||''); });
+    dirs.forEach(function(dir){
+      html += '<div onclick="abrirDetalle(\'' + esc(dir.codigo) + '\',\'jerarquico\')" style="padding:5px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .12s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'">';
+      html += '<span style="font-family:Courier New,monospace;font-size:9px;color:var(--text3);min-width:50px">' + (dir.codigo||'') + '</span>';
+      html += '<span style="font-size:11.5px;color:var(--text)">' + (dir.nombreCargo||'') + '</span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
   });
   html += '</div></div>';
 
@@ -2062,16 +2080,32 @@ function irAOrganigrama() {
   
   if (otrasInstancias.length > 0) {
     var todasInstancias = [d].concat(otrasInstancias);
-    var areaChips = todasInstancias.map(function(inst) {
+    var areaRows = todasInstancias.map(function(inst, idx) {
       var p = (inst.secretaria || '').split('\u2014');
       var secLabel = p[1] ? p[1].trim() : (inst.secretaria || 'Sin área');
-      return '<span style="display:inline-block;padding:4px 10px;background:#dbeafe;color:#1e40af;font-size:11px;font-weight:600;border-radius:12px">' + secLabel + '</span>';
+      var depParts = (inst.dependencia || '').split('\u2014');
+      var depLabel = depParts[depParts.length - 1].trim();
+      var instData = JSON.stringify({codigo:inst.codigo,tipoRegistro:inst.tipoRegistro,nombreCargo:inst.nombreCargo,secretaria:inst.secretaria,dependencia:inst.dependencia,nivel:inst.nivel,tipoPuesto:inst.tipoPuesto}).replace(/"/g,'&quot;');
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:' + (idx % 2 === 0 ? '#f0f7ff' : '#fff') + '">' +
+        '<div style="width:28px;height:28px;background:#1d4ed8;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/></svg>' +
+        '</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:12px;font-weight:700;color:var(--navy)">' + secLabel + '</div>' +
+          (depLabel ? '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + depLabel + '</div>' : '') +
+        '</div>' +
+        '<button onclick="irAOrganigramaInstancia(' + instData + ')" style="padding:5px 10px;border:1px solid #bfdbfe;border-radius:var(--r-sm);background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:700;cursor:pointer">Ver</button>' +
+      '</div>';
     }).join('');
-    var areasDiv = '<div style="margin-bottom:16px;padding:12px 16px;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:var(--r);text-align:center">' +
-      '<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Este puesto existe en ' + todasInstancias.length + ' áreas</div>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">' + areaChips + '</div>' +
-    '</div>';
-    area.innerHTML = areasDiv + area.innerHTML;
+    area.innerHTML =
+      '<div style="width:100%;max-width:520px;margin:0 auto">' +
+        '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#1d4ed8;margin-bottom:12px;text-align:center">&#x1F4CC; Este puesto existe en ' + todasInstancias.length + ' \xE1reas</div>' +
+        '<div style="background:var(--surface);border:1px solid #bfdbfe;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh)">' + areaRows + '</div>' +
+        '<div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3)">Seleccion\xE1 un \xE1rea para ver la ubicaci\xF3n en el organigrama</div>' +
+      '</div>';
+    document.getElementById('org-loc-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    return;
   }
 
   // mostrar modal
