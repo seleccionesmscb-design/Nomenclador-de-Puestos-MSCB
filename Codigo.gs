@@ -281,9 +281,8 @@ function getDatosCombinados() {
       .map(function(f) {
         var tipo       = String(f[2] || '').trim();
         var codigo     = String(f[0] || '').trim();
-        var depCode    = String(f[8] || '').trim(); // columna I: código jerárquico de dependencia
-        var secFromDep = depCode ? (SEC_POR_PREFIJO[depCode.substring(0, 3)] || '') : '';
-        var sec        = secFromDep || SECRETARIA_NOJER[codigo] || '';
+        var depCode    = String(f[9] || '').trim(); // columna J: nombre de la unidad de dependencia
+        var sec        = SECRETARIA_NOJER[codigo] || '';
         return {
           tipoRegistro:      'nojerarquico',
           codigo:            codigo,
@@ -359,27 +358,19 @@ function getDetallePuesto(codigo, tipoRegistro) {
       if (!filaCargo) return { ok: false, mensaje: 'Cargo no encontrado: ' + codigo };
 
       tipoPuesto = String(filaCargo[2] || '').trim();
-      var depCodeDet    = String(filaCargo[8] || '').trim(); // col I: código jerárquico de dependencia
-      var SEC_MAP_DET = {
-        '101':'101 — Intendencia','102':'102 — Sec. Legal y T\xE9cnica',
-        '103':'103 — Sec. Coord. Obras y Servicios','104':'104 — Sec. de Deportes',
-        '105':'105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n','106':'106 — Sec. de Hacienda',
-        '107':'107 — Sec. Obras y Servicios P\xFAblicos','108':'108 — Sec. Planeamiento Territorial',
-        '109':'109 — Sec. Capital Humano y Acci\xF3n Social','110':'110 — Sec. Producci\xF3n y Empleo',
-        '111':'111 — Sec. Protecci\xF3n Ciudadana','112':'112 — Sec. de Turismo'
-      };
-      var secFromDepDet = depCodeDet ? (SEC_MAP_DET[depCodeDet.substring(0, 3)] || '') : '';
+      var depCodeDet = String(filaCargo[9] || '').trim(); // col J: nombre de la unidad de dependencia
+      var codigoDet  = String(filaCargo[0] || '').trim();
       detalle = {
         tipoRegistro:          'nojerarquico',
-        codigo:                String(filaCargo[0] || '').trim(),
+        codigo:                codigoDet,
         nivel:                 'No jer\xE1rquico',
         nombreCargo:           String(filaCargo[1] || '').trim(),
         tipoPuesto:            tipoPuesto,
         codigoPuesto:          '',
         orientacion:           orientacionDesdeTipo_(tipoPuesto),
-        secretaria:            secFromDepDet || SECRETARIA_NOJER[String(filaCargo[0] || '').trim()] || '',
+        secretaria:            SECRETARIA_NOJER[codigoDet] || '',
         dependencia:           depCodeDet,
-        misionEspecifica:      String(filaCargo[9] || '').trim(),
+        misionEspecifica:      String(filaCargo[10] || '').trim(),
         requisitosEspecificos: '',
         titulacion:            String(filaCargo[3] || '').trim(),
         requiereTitulo:        String(filaCargo[3] || '').trim() !== '' ? 'S\xED' : 'No',
@@ -389,10 +380,10 @@ function getDetallePuesto(codigo, tipoRegistro) {
         adicional1:              String(filaCargo[6]  || '').trim(),
         adicional2:              String(filaCargo[7]  || '').trim(),
         normativa:               '',
-        competenciasPrincipales: String(filaCargo[10] || '').trim(),
-        competenciasSecundarias: String(filaCargo[11] || '').trim(),
-        resultadosIndicadores:   String(filaCargo[12] || '').trim(),
-        responsabilidades:       String(filaCargo[13] || '').trim(),
+        competenciasPrincipales: String(filaCargo[11] || '').trim(),
+        competenciasSecundarias: String(filaCargo[12] || '').trim(),
+        resultadosIndicadores:   String(filaCargo[13] || '').trim(),
+        responsabilidades:       String(filaCargo[14] || '').trim(),
         puestoGenerico:          null
       };
 

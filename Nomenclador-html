@@ -1663,10 +1663,14 @@ function irAOrganigrama() {
 
   if (esNoJer) {
     // ── No Jerárquico: trazar ruta hasta la unidad de dependencia ──
-    // d.dependencia contiene el código de la unidad padre (ej: "1010400001004")
     var depRaw    = (d.dependencia || '').trim();
+    // Buscar primero por código numérico, luego por nombre exacto
     var codigoDep = depRaw.split('—')[0].trim().split(' ')[0].trim();
-    var unidadDep = DATOS.filter(function(r){ return r.codigo === codigoDep; })[0];
+    var unidadDep = DATOS.filter(function(r){ return r.tipoRegistro !== 'nojerarquico' && r.codigo === codigoDep; })[0];
+    if (!unidadDep && depRaw) {
+      unidadDep = DATOS.filter(function(r){ return r.tipoRegistro !== 'nojerarquico' && r.nombreCargo === depRaw; })[0];
+      if (unidadDep) codigoDep = unidadDep.codigo;
+    }
 
     function svgNodo(tipo) {
       if (tipo === 'sec') return '<rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/>';
