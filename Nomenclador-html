@@ -287,8 +287,8 @@ body {
 .org-toolbar select { border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 6px 10px; font-size: 12px; font-family: Segoe UI, Arial, sans-serif; color: var(--text); outline: none; cursor: pointer; }
 .org-layout { display: flex; gap: 0; }
 .org-area { min-height: 500px; padding: 32px; overflow-x: auto; display: flex; justify-content: flex-start; align-items: flex-start; flex: 1; min-width: 0; }
-.org-sidebar { width: 260px; min-width: 260px; border-left: 1px solid var(--border); background: var(--surface); overflow-y: auto; display: none; align-self: stretch; }
-.org-sidebar.visible { display: block; }
+.org-dropdown { position: absolute; top: 12px; right: 12px; width: 280px; max-height: calc(100% - 24px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--sh-lg); overflow-y: auto; display: none; z-index: 20; }
+.org-dropdown.visible { display: block; }
 .org-sidebar-header { padding: 12px 14px; font-size: 11px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); background: var(--surface2); position: sticky; top: 0; }
 .org-sidebar-item { padding: 7px 14px; font-size: 11.5px; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; transition: background .12s; }
 .org-sidebar-item:hover { background: var(--surface2); }
@@ -550,13 +550,16 @@ body {
           <select id="org-filtro-sec" onchange="renderizarOrganigrama()" style="display:none">
             <option value="">Todas las Secretar&#xED;as</option>
           </select>
-          <button class="header-btn" onclick="exportarOrg()" style="margin-left:auto"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar</button>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+            <button id="org-puestos-toggle" class="header-btn" onclick="toggleOrgPuestos()" style="display:none"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> <span id="org-puestos-toggle-label">Puestos del &#xE1;rea</span></button>
+            <button class="header-btn" onclick="exportarOrg()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar</button>
+          </div>
         </div>
-        <div class="org-layout">
+        <div class="org-layout" style="position:relative">
           <div class="org-area" id="org-area">
             <div class="loader-full"><div class="spinner"></div><p>Cargando organigrama&#x2026;</p></div>
           </div>
-          <div class="org-sidebar" id="org-sidebar">
+          <div class="org-dropdown" id="org-sidebar">
             <div class="org-sidebar-header" id="org-sidebar-titulo">Puestos del &#xE1;rea</div>
             <div id="org-sidebar-lista"></div>
           </div>
@@ -2087,31 +2090,32 @@ function irAOrganigrama() {
   var areasUnicas = Object.keys(areasMap).sort().map(function(k){ return areasMap[k]; });
 
   if (areasUnicas.length > 1) {
-    var areaRows = areasUnicas.map(function(inst) {
+    var areaCards = areasUnicas.map(function(inst) {
       var p = (inst.secretaria || '').split('\u2014');
+      var secCod = p[0] ? p[0].trim() : '';
       var secLabel = p[1] ? p[1].trim() : (inst.secretaria || 'Sin área');
       var depParts = (inst.dependencia || '').split('\u2014');
       var depLabel = depParts[depParts.length - 1].trim();
-      return '<div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border)">' +
-        '<div style="width:30px;height:30px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
-          '<svg style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/></svg>' +
+      return '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);transition:border-color .15s,box-shadow .15s" onmouseover="this.style.borderColor=\'#bfdbfe\';this.style.boxShadow=\'var(--sh)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.boxShadow=\'none\'">' +
+        '<div style="width:34px;height:34px;background:#eff6ff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg>' +
         '</div>' +
         '<div style="flex:1;min-width:0">' +
-          '<div style="font-size:12.5px;font-weight:700;color:var(--navy)">' + secLabel + '</div>' +
-          (depLabel ? '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + depLabel + '</div>' : '') +
+          '<div style="font-size:12px;font-weight:700;color:var(--navy);line-height:1.3">' + secLabel + '</div>' +
+          '<div style="font-size:9.5px;color:var(--text3);margin-top:2px">' + (depLabel || ('C\xF3d. \xE1rea ' + secCod)) + '</div>' +
         '</div>' +
       '</div>';
     }).join('');
     area.innerHTML =
-      '<div style="width:100%;max-width:540px;margin:0 auto">' +
-        '<div style="text-align:center;margin-bottom:16px">' +
-          '<div style="display:inline-flex;align-items:center;gap:8px;background:#1d4ed8;color:#fff;padding:7px 16px;border-radius:24px;font-size:12px;font-weight:700">' +
-            '<svg style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+      '<div style="width:100%;max-width:680px;margin:0 auto">' +
+        '<div style="text-align:center;margin-bottom:20px">' +
+          '<div style="display:inline-flex;align-items:center;gap:8px;background:#1d4ed8;color:#fff;padding:8px 18px;border-radius:24px;font-size:13px;font-weight:700">' +
+            '<svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
             (d.nombreCargo || '') +
           '</div>' +
-          '<div style="font-size:11px;color:var(--text2);margin-top:8px">Este puesto es transversal: existe en <b>' + areasUnicas.length + ' \xE1reas</b></div>' +
+          '<div style="font-size:12px;color:var(--text2);margin-top:10px">Puesto transversal &mdash; presente en <b style="color:var(--navy)">' + areasUnicas.length + ' \xE1reas</b> del organigrama</div>' +
         '</div>' +
-        '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh)">' + areaRows + '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">' + areaCards + '</div>' +
       '</div>';
     document.getElementById('org-loc-overlay').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -2144,6 +2148,13 @@ function toggleOrgExpand(ev, codigo) {
 function seleccionarSecOrg(val) {
   orgSecSeleccionada = val;
   renderizarOrganigrama();
+}
+
+function toggleOrgPuestos(forzar) {
+  var sidebar = document.getElementById('org-sidebar');
+  if (!sidebar) return;
+  if (forzar === false) { sidebar.classList.remove('visible'); return; }
+  sidebar.classList.toggle('visible');
 }
 
 function renderizarOrganigrama() {
@@ -2257,26 +2268,28 @@ function renderizarOrganigrama() {
       '</button>' +
     '</div>' + html;
 
-  // Sidebar de puestos de la secretaría seleccionada
+  // Desplegable de puestos de la secretaría seleccionada (cerrado por defecto)
   var sidebar = document.getElementById('org-sidebar');
   var sidebarLista = document.getElementById('org-sidebar-lista');
   var sidebarTitulo = document.getElementById('org-sidebar-titulo');
+  var toggleBtn = document.getElementById('org-puestos-toggle');
+  var toggleLbl = document.getElementById('org-puestos-toggle-label');
   if (filtroSecOrg && sidebar) {
-    var partesSidebar = filtroSecOrg.split('—');
-    var secNomSidebar = partesSidebar[1] ? partesSidebar[1].trim() : filtroSecOrg;
-    sidebarTitulo.textContent = 'Puestos — ' + secNomSidebar;
     var puestosSec = DATOS.filter(function(d){
       return d.secretaria === filtroSecOrg && d.tipoRegistro === 'nojerarquico';
     });
-    if (puestosSec.length === 0) {
+    // Deduplicar por nombre
+    var seen = {};
+    var unique = [];
+    puestosSec.forEach(function(p) {
+      if (!seen[p.nombreCargo]) { seen[p.nombreCargo] = true; unique.push(p); }
+    });
+    sidebarTitulo.innerHTML = 'Puestos del \xE1rea (' + unique.length + ')' +
+      '<button onclick="toggleOrgPuestos(false)" style="float:right;background:none;border:none;cursor:pointer;color:var(--text3);padding:0;line-height:1">' +
+        '<svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+    if (unique.length === 0) {
       sidebarLista.innerHTML = '<div style="padding:14px;font-size:11px;color:var(--text3)">Sin puestos no jerárquicos en este área</div>';
     } else {
-      // Deduplicar por nombre
-      var seen = {};
-      var unique = [];
-      puestosSec.forEach(function(p) {
-        if (!seen[p.nombreCargo]) { seen[p.nombreCargo] = true; unique.push(p); }
-      });
       sidebarLista.innerHTML = unique.map(function(p){
         var cod = esc(p.codigo);
         var onclick = 'abrirDetalle(\'' + cod + '\',\'nojerarquico\')';
@@ -2286,9 +2299,12 @@ function renderizarOrganigrama() {
         '</div>';
       }).join('');
     }
-    sidebar.classList.add('visible');
-  } else if (sidebar) {
-    sidebar.classList.remove('visible');
+    if (toggleBtn) { toggleBtn.style.display = ''; }
+    if (toggleLbl) { toggleLbl.textContent = 'Puestos del \xE1rea (' + unique.length + ')'; }
+    sidebar.classList.remove('visible'); // cerrado por defecto al re-renderizar
+  } else {
+    if (sidebar) sidebar.classList.remove('visible');
+    if (toggleBtn) toggleBtn.style.display = 'none';
   }
 
   if (orgCodigoDestacado) {
