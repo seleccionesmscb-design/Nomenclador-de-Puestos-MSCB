@@ -1550,46 +1550,75 @@ function volverAreas() {
 // CATEGORÍAS
 // ============================================================
 function renderizarCategorias() {
-  var cat = {};
-  DATOS.forEach(function(d){
-    var o = d.tipoPuesto || d.orientacion || 'Sin clasificar';
-    if (!cat[o]) cat[o] = [];
-    cat[o].push(d);
-  });
-  var COLORS = ['#dbeafe','#d1fae5','#ede9fe','#fff7ed','#fce7f3','#fef3c7'];
-  var ICONS  = ['<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>','<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.59a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>'];
-  var keys = Object.keys(cat).sort();
   var cont = document.getElementById('categorias-content');
-  cont.innerHTML = keys.map(function(o, idx){
-    var color = COLORS[idx % COLORS.length];
-    var icon  = ICONS[idx % ICONS.length];
-    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:16px;overflow:hidden;box-shadow:var(--sh)">' +
-      '<div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:' + color + '">' +
-        '<span style="font-size:22px">' + icon + '</span>' +
-        '<div>' +
-          '<div style="font-size:14px;font-weight:700;color:var(--navy)">' + o + '</div>' +
-          '<div style="font-size:11px;color:var(--text2)">' + cat[o].length + ' cargos en esta categor\xEDa</div>' +
-        '</div>' +
-      '</div>' +
-      '<div style="padding:12px 16px;display:flex;flex-direction:column;gap:6px">' +
-        cat[o].slice(0, 5).map(function(d){
-          return '<div onclick="abrirDetalle(\'' + esc(d.codigo) + '\')" ' +
-            'style="padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .15s" ' +
-            'onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'">' +
-            '<span style="font-family:Courier New,monospace;font-size:10px;color:var(--text3);min-width:80px">' + (d.codigo || '') + '</span>' +
-            '<span style="font-size:12.5px;font-weight:600;color:var(--navy)">' + (d.nombreCargo || '') + '</span>' +
-            '<span style="margin-left:auto;font-size:10px;color:var(--text3)">' + (d.nivel || '') + '</span>' +
-            '</div>';
-        }).join('') +
-        (cat[o].length > 5 ? '<div style="font-size:11px;color:var(--text3);padding:6px 12px">+ ' + (cat[o].length - 5) + ' m\xE1s...</div>' : '') +
-      '</div>' +
-      '</div>';
-  }).join('');
+  if (!cont) return;
+
+  var html = '';
+
+  // BLOQUE 1: EJES (Direcciones por Secretaría)
+  var secsMap = {};
+  DATOS.filter(function(d) { return d.nivel === 'Direcci\xF3n'; }).forEach(function(d) {
+    var s = d.secretaria || 'Entes Aut\xE1rquicos';
+    if (!secsMap[s]) secsMap[s] = [];
+    secsMap[s].push(d);
+  });
+  var secKeys = Object.keys(secsMap).sort();
+  
+  html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--sh)">';
+  html += '<div id="ejes-header" onclick="document.getElementById(\'ejes-list\').style.display = document.getElementById(\'ejes-list\').style.display===\'none\'?\'\':\'none\'; document.getElementById(\'ejes-arrow\').textContent = document.getElementById(\'ejes-list\').style.display===\'none\'?\'▼\':\'▲\';" style="padding:14px 20px;cursor:pointer;background:#f0f7ff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">';
+  html += '<div style="display:flex;align-items:center;gap:10px"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg><span style="font-size:13px;font-weight:700;color:var(--navy)">Ejes (Secretar\xEDas)</span></div>';
+  html += '<span id="ejes-arrow" style="font-size:12px;color:var(--text2)">▲</span></div>';
+  html += '<div id="ejes-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:6px">';
+  secKeys.forEach(function(s) {
+    var partes = s.split('\u2014');
+    var nombre = partes[1] ? partes[1].trim() : s;
+    html += '<div style="padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .15s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'"><span style="font-size:12.5px;font-weight:600;color:var(--navy)">' + nombre + '</span><span style="font-size:10px;color:var(--text3)">' + secsMap[s].length + ' direcci\xF3n' + (secsMap[s].length !== 1 ? 'es' : '') + '</span></div>';
+  });
+  html += '</div></div>';
+
+  // BLOQUE 2: TIPO DE PUESTOS
+  var byType = {};
+  DATOS.forEach(function(d) {
+    var esNoJer = d.tipoRegistro === 'nojerarquico';
+    var typeMain = esNoJer ? 'No Jer\xE1rquico' : 'Jer\xE1rquico';
+    if (!byType[typeMain]) byType[typeMain] = { all: [], sub: {} };
+    byType[typeMain].all.push(d);
+    var orient = d.orientacion || 'Sin clasificar';
+    if (!byType[typeMain].sub[orient]) byType[typeMain].sub[orient] = [];
+    byType[typeMain].sub[orient].push(d);
+  });
+  
+  html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--sh)">';
+  html += '<div id="tipos-header" onclick="document.getElementById(\'tipos-list\').style.display = document.getElementById(\'tipos-list\').style.display===\'none\'?\'\':\'none\'; document.getElementById(\'tipos-arrow\').textContent = document.getElementById(\'tipos-list\').style.display===\'none\'?\'▼\':\'▲\';" style="padding:14px 20px;cursor:pointer;background:#f0fdf4;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">';
+  html += '<div style="display:flex;align-items:center;gap:10px"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg><span style="font-size:13px;font-weight:700;color:var(--navy)">Tipo de Puestos</span></div>';
+  html += '<span id="tipos-arrow" style="font-size:12px;color:var(--text2)">▲</span></div>';
+  html += '<div id="tipos-list" style="padding:12px 16px">';
+  
+  ['Jer\xE1rquico', 'No Jer\xE1rquico'].forEach(function(tk) {
+    if (!byType[tk]) return;
+    var allPos = byType[tk].all;
+    var subOrient = byType[tk].sub;
+    var orientKeys = Object.keys(subOrient).sort();
+    html += '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">' + tk + ' (' + allPos.length + ')</div>';
+    html += '<div style="margin-left:10px;display:flex;flex-direction:column;gap:4px">';
+    orientKeys.forEach(function(ok) {
+      var cnt = subOrient[ok].length;
+      var idSub = 'sub-' + tk.replace(/\s/g, '_') + '_' + ok.replace(/\s/g, '_');
+      html += '<button onclick="var el=document.getElementById(\'' + idSub + '\'); el.style.display=el.style.display===\'none\'?\'\':\'none\';" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);font-size:10px;font-weight:600;color:var(--text2);cursor:pointer;width:100%;justify-content:space-between">';
+      html += '<span>' + ok + ' (' + cnt + ')</span><svg style="width:10px;height:10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>';
+      html += '<div id="' + idSub + '" style="display:none;margin-top:4px;padding-left:12px;border-left:2px solid var(--border);display:flex;flex-direction:column;gap:3px">';
+      subOrient[ok].forEach(function(p) {
+        html += '<div onclick="abrirDetalle(\'' + esc(p.codigo) + '\',\'' + esc(p.tipoRegistro || 'jerarquico') + '\')" style="padding:4px 8px;border-radius:6px;cursor:pointer;font-size:10.5px;color:var(--text);display:flex;align-items:center;gap:6px;transition:background .15s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'"><span style="font-family:Courier New,monospace;font-size:9px;color:var(--text3);min-width:60px">' + (p.codigo || '') + '</span><span style="font-weight:600;flex:1">' + (p.nombreCargo || '') + '</span></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  
+  html += '</div></div>';
+  cont.innerHTML = html;
 }
 
-// ============================================================
-// ADICIONALES POR PUESTO
-// ============================================================
 function renderizarAdicionales() {
   var cont = document.getElementById('adicionales-content');
   if (!cont) return;
@@ -1983,6 +2012,25 @@ function irAOrganigrama() {
       html2 += '</div></div>';
       area.innerHTML = html2;
     }
+  }
+
+  // Si el puesto está en múltiples áreas, mostrar listado al inicio
+  var otrasInstancias = d.tipoRegistro === 'nojerarquico'
+    ? DATOS.filter(function(r){ return r.tipoRegistro === 'nojerarquico' && r.nombreCargo === d.nombreCargo && r.codigo !== d.codigo; })
+    : [];
+  
+  if (otrasInstancias.length > 0) {
+    var todasInstancias = [d].concat(otrasInstancias);
+    var areaChips = todasInstancias.map(function(inst) {
+      var p = (inst.secretaria || '').split('\u2014');
+      var secLabel = p[1] ? p[1].trim() : (inst.secretaria || 'Sin área');
+      return '<span style="display:inline-block;padding:4px 10px;background:#dbeafe;color:#1e40af;font-size:11px;font-weight:600;border-radius:12px">' + secLabel + '</span>';
+    }).join('');
+    var areasDiv = '<div style="margin-bottom:16px;padding:12px 16px;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:var(--r);text-align:center">' +
+      '<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Este puesto existe en ' + todasInstancias.length + ' áreas</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">' + areaChips + '</div>' +
+    '</div>';
+    area.innerHTML = areasDiv + area.innerHTML;
   }
 
   // mostrar modal
