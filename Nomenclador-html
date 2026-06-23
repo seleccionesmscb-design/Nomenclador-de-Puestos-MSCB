@@ -330,8 +330,8 @@ body {
 .org-node.secretaria { background: #dbeafe; border-color: #93c5fd; }
 .org-node.direccion { background: var(--surface); border-color: var(--border2); }
 .org-node.jefatura { background: var(--surface2); border-color: var(--border); font-size: 11px; }
-.org-node.destacado { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(59,130,246,.35), var(--sh-lg) !important; animation: destacado-pulse 1.2s ease-out 3; }
-@keyframes destacado-pulse { 0%,100% { box-shadow: 0 0 0 3px rgba(59,130,246,.35), var(--sh-lg); } 50% { box-shadow: 0 0 0 7px rgba(59,130,246,.12), var(--sh-lg); } }
+.org-node.destacado { border-color: var(--accent) !important; background: #eff6ff !important; box-shadow: 0 0 0 4px rgba(59,130,246,.4), var(--sh-lg) !important; animation: destacado-pulse 1s ease-in-out infinite; }
+@keyframes destacado-pulse { 0%,100% { box-shadow: 0 0 0 4px rgba(59,130,246,.4), var(--sh-lg); } 50% { box-shadow: 0 0 0 10px rgba(59,130,246,.08), var(--sh-lg); } }
 .on-icono { font-size: 16px; margin-bottom: 3px; display: block; }
 .on-nombre { font-size: 10.5px; font-weight: 700; line-height: 1.25; }
 .org-node.root .on-nombre { color: #fff; }
@@ -783,6 +783,25 @@ body {
       <div class="det-tab" onclick="cambiarTab('contexto')" id="tab-contexto">Contexto</div>
     </div>
     <div class="detalle-body" id="detalle-body"></div>
+  </div>
+</div>
+
+<!-- Modal organigrama ubicación -->
+<div id="org-loc-overlay" onclick="cerrarOrgLoc(event)" style="position:fixed;inset:0;z-index:400;background:rgba(11,29,58,.6);display:none;align-items:center;justify-content:center;animation:fadeIn .2s ease">
+  <div id="org-loc-modal" style="background:var(--surface);border-radius:var(--r-lg);width:94vw;max-width:1140px;height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 72px rgba(11,29,58,.4)" onclick="event.stopPropagation()">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);position:sticky;top:0;z-index:10">
+      <div style="width:34px;height:34px;border-radius:8px;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy)" id="org-loc-titulo">Ubicación en el organigrama</div>
+        <div style="font-size:11px;color:var(--text2)" id="org-loc-subtitulo"></div>
+      </div>
+      <button onclick="cerrarOrgLoc()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text3);padding:6px;border-radius:6px;line-height:1;transition:all .15s" onmouseover="this.style.color='var(--red)';this.style.background='var(--red-pale)'" onmouseout="this.style.color='var(--text3)';this.style.background='none'">
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="org-loc-body" style="overflow:auto;flex:1;padding:28px 32px;display:flex;justify-content:flex-start;align-items:flex-start"></div>
   </div>
 </div>
 
@@ -1578,18 +1597,119 @@ function renderizarCatEscalafon() {
 // ============================================================
 function irAOrganigrama() {
   var d = puestoDetalle;
-  if (!d) { cerrarDetalle(); navegar('organigrama'); return; }
-  orgSecSeleccionada = d.secretaria || '';
-  orgCodigoDestacado = d.codigo || null;
-  if ((d.nivel === 'Departamento' || d.nivel === 'Divisi\xF3n') && d.secretaria) {
+  if (!d) return;
+
+  var sec = d.secretaria || '';
+  var codigoTarget = d.codigo || '';
+
+  // título del modal
+  var secNombre = sec ? (sec.split('—')[1] || sec).trim() : 'Organigrama';
+  document.getElementById('org-loc-titulo').textContent = 'Ubicaci\xF3n en el organigrama';
+  document.getElementById('org-loc-subtitulo').textContent = secNombre + (d.nombreCargo ? ' — ' + d.nombreCargo : '');
+
+  // pre-expandir dirección padre si el puesto es departamento/división
+  if ((d.nivel === 'Departamento' || d.nivel === 'Divisi\xF3n') && sec) {
     var parent = DATOS.filter(function(p){
-      return p.nivel === 'Direcci\xF3n' && p.secretaria === d.secretaria
-        && String(d.codigo).startsWith(String(p.codigo).substring(0, 10));
+      return p.nivel === 'Direcci\xF3n' && p.secretaria === sec
+        && String(codigoTarget).startsWith(String(p.codigo).substring(0, 10));
     })[0];
     if (parent) orgExpandido[parent.codigo] = true;
   }
-  cerrarDetalle();
-  navegar('organigrama');
+
+  // renderizar organigrama en el modal
+  var tmpSec = orgSecSeleccionada;
+  orgSecSeleccionada = sec;
+  var area = document.getElementById('org-loc-body');
+  area.innerHTML = '';
+
+  var dirs = DATOS.filter(function(r){
+    return r.nivel === 'Direcci\xF3n' && r.secretaria === sec;
+  });
+
+  if (dirs.length === 0) {
+    area.innerHTML = '<div class="empty-state"><div class="es-title">Sin datos para esta secretar\xEDa</div></div>';
+  } else {
+    var grupos = {};
+    dirs.forEach(function(r){
+      var s = r.secretaria || 'Entes Aut\xE1rquicos';
+      if (!grupos[s]) grupos[s] = [];
+      grupos[s].push(r);
+    });
+    var html = '<div style="display:flex;flex-direction:column;gap:40px;width:100%">';
+    Object.keys(grupos).forEach(function(s){
+      var partes = s.split('—');
+      var nombre = partes[1] ? partes[1].trim() : s;
+      var cod    = partes[0].trim();
+      html += '<div style="display:flex;flex-direction:column;align-items:center">' +
+          '<div class="org-node secretaria" style="min-width:180px;max-width:220px">' +
+            '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span>' +
+            '<div class="on-nombre">' + nombre + '</div>' +
+            '<div class="on-codigo">C\xF3d. \xC1REA ' + cod + '</div>' +
+          '</div>' +
+        '<div class="org-stem-down"></div>' +
+        '<div class="org-children">' +
+          grupos[s].map(function(r){
+            var subdeps = DATOS.filter(function(sub){
+              return (sub.secretaria === r.secretaria)
+                && (sub.nivel === 'Departamento' || sub.nivel === 'Divisi\xF3n')
+                && String(sub.codigo).startsWith(String(r.codigo).substring(0, 10));
+            });
+            var esDirDestacada = r.codigo === codigoTarget;
+            return '<div class="org-child">' +
+              '<div class="org-stem-v"></div>' +
+              '<div id="orgloc-node-' + esc(r.codigo) + '" class="org-node direccion' + (esDirDestacada ? ' destacado' : '') + '" onclick="abrirDetalle(\'' + esc(r.codigo) + '\')" title="' + (r.nombreCargo || '') + '">' +
+                '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/></svg></span>' +
+                '<div class="on-nombre">' + (r.nombreCargo || '').replace('Direcci\xF3n de ', 'Dir. de ').substring(0, 24) + '</div>' +
+                '<div class="on-codigo">' + (r.codigo || '') + '</div>' +
+              '</div>' +
+              (subdeps.length > 0 ?
+                '<div class="org-stem-down"></div>' +
+                '<div class="org-children">' +
+                  (orgExpandido[r.codigo] ? subdeps : subdeps.slice(0, 4)).map(function(sub){
+                    var esSubDestacado = sub.codigo === codigoTarget;
+                    return '<div class="org-child">' +
+                      '<div class="org-stem-v"></div>' +
+                      '<div id="orgloc-node-' + esc(sub.codigo) + '" class="org-node jefatura' + (esSubDestacado ? ' destacado' : '') + '" onclick="abrirDetalle(\'' + esc(sub.codigo) + '\')" title="' + (sub.nombreCargo || '') + '" style="min-width:96px;max-width:124px">' +
+                        '<div class="on-nombre" style="font-size:10px">' + (sub.nombreCargo || '').substring(0, 22) + '</div>' +
+                        '<div class="on-codigo">' + (sub.codigo || '') + '</div>' +
+                      '</div>' +
+                    '</div>';
+                  }).join('') +
+                  (!orgExpandido[r.codigo] && subdeps.length > 4 ?
+                    '<div class="org-child">' +
+                      '<div class="org-stem-v"></div>' +
+                      '<div class="org-node jefatura" onclick="orgExpandido[\'' + esc(r.codigo) + '\']=true;irAOrganigrama()" style="font-size:10px;color:var(--accent);font-weight:700">+' + (subdeps.length - 4) + ' m\xE1s</div>' +
+                    '</div>'
+                  : '') +
+                '</div>'
+              : '') +
+              '</div>';
+          }).join('') +
+        '</div>' +
+        '</div>';
+    });
+    html += '</div>';
+    area.innerHTML = html;
+  }
+
+  orgSecSeleccionada = tmpSec;
+
+  // mostrar modal
+  var overlay = document.getElementById('org-loc-overlay');
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  // scroll al nodo destacado
+  setTimeout(function(){
+    var el = document.getElementById('orgloc-node-' + codigoTarget);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  }, 120);
+}
+
+function cerrarOrgLoc(e) {
+  if (e && e.target !== document.getElementById('org-loc-overlay')) return;
+  document.getElementById('org-loc-overlay').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function toggleOrgExpand(ev, codigo) {
