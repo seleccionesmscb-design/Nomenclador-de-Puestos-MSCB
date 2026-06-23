@@ -1959,11 +1959,11 @@ function irAOrganigrama() {
     }
 
     html += '<div class="org-stem-down"></div>' +
-      '<div id="orgloc-node-' + esc(codigoTarget) + '" style="position:relative;min-width:160px;max-width:240px;cursor:default;background:#1d4ed8;border:2px solid #1e40af;border-radius:var(--r);padding:10px 14px;text-align:center;box-shadow:0 4px 18px rgba(29,78,216,.5)">' +
-        '<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#1d4ed8;border:1px solid #60a5fa;border-radius:20px;padding:1px 8px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#bfdbfe;white-space:nowrap">&#x1F4CC; ESTE PUESTO</div>' +
-        '<div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#93c5fd;margin-bottom:4px">' + (d.tipoPuesto || 'No Jer\xE1rquico') + '</div>' +
-        '<div style="font-size:12px;font-weight:700;color:#fff;line-height:1.3">' + (d.nombreCargo || '') + '</div>' +
-        '<div style="font-size:9px;color:#93c5fd;margin-top:3px">' + codigoTarget + '</div>' +
+      '<div id="orgloc-node-' + esc(codigoTarget) + '" style="min-width:150px;max-width:220px;cursor:default;background:#1d4ed8;border-radius:10px;padding:8px 14px;text-align:center;box-shadow:0 3px 12px rgba(29,78,216,.4)">' +
+        '<div style="display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#bfdbfe;margin-bottom:5px">' +
+          '<svg style="width:9px;height:9px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>ESTE PUESTO</div>' +
+        '<div style="font-size:11.5px;font-weight:700;color:#fff;line-height:1.3">' + (d.nombreCargo || '') + '</div>' +
+        '<div style="font-size:8.5px;color:#93c5fd;margin-top:3px">' + (d.tipoPuesto || 'No Jer\xE1rquico') + '</div>' +
       '</div>';
 
     html += '</div>';
@@ -2072,34 +2072,46 @@ function irAOrganigrama() {
     }
   }
 
-  // Si el puesto está en múltiples áreas, mostrar listado al inicio
-  // detect multi-area regardless of server tipoRegistro field
-  var otrasInstancias = DATOS.filter(function(r){ return r.tipoRegistro === 'nojerarquico' && r.nombreCargo === d.nombreCargo && r.codigo !== d.codigo; });
-  
-  if (otrasInstancias.length > 0) {
-    var todasInstancias = [d].concat(otrasInstancias);
-    var areaRows = todasInstancias.map(function(inst, idx) {
+  // Si el puesto está en múltiples áreas (mismo nombre de cargo en varias secretarías),
+  // mostrar un listado de áreas en vez de un organigrama. Los puestos transversales
+  // (ej: Administrativo/a general) se replican con el MISMO código en cada secretaría,
+  // por eso se agrupa por nombreCargo y se deduplica por secretaría.
+  var mismoNombre = DATOS.filter(function(r){
+    return r.tipoRegistro === 'nojerarquico' && r.nombreCargo === d.nombreCargo;
+  });
+  var areasMap = {};
+  mismoNombre.forEach(function(r){
+    var sec = r.secretaria || '';
+    if (sec && !areasMap[sec]) areasMap[sec] = r;
+  });
+  var areasUnicas = Object.keys(areasMap).sort().map(function(k){ return areasMap[k]; });
+
+  if (areasUnicas.length > 1) {
+    var areaRows = areasUnicas.map(function(inst) {
       var p = (inst.secretaria || '').split('\u2014');
       var secLabel = p[1] ? p[1].trim() : (inst.secretaria || 'Sin área');
       var depParts = (inst.dependencia || '').split('\u2014');
       var depLabel = depParts[depParts.length - 1].trim();
-      var instData = JSON.stringify({codigo:inst.codigo,tipoRegistro:inst.tipoRegistro,nombreCargo:inst.nombreCargo,secretaria:inst.secretaria,dependencia:inst.dependencia,nivel:inst.nivel,tipoPuesto:inst.tipoPuesto}).replace(/"/g,'&quot;');
-      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:' + (idx % 2 === 0 ? '#f0f7ff' : '#fff') + '">' +
-        '<div style="width:28px;height:28px;background:#1d4ed8;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
-          '<svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/></svg>' +
+      return '<div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border)">' +
+        '<div style="width:30px;height:30px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<svg style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/></svg>' +
         '</div>' +
-        '<div style="flex:1">' +
-          '<div style="font-size:12px;font-weight:700;color:var(--navy)">' + secLabel + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:12.5px;font-weight:700;color:var(--navy)">' + secLabel + '</div>' +
           (depLabel ? '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + depLabel + '</div>' : '') +
         '</div>' +
-        '<button onclick="irAOrganigramaInstancia(' + instData + ')" style="padding:5px 10px;border:1px solid #bfdbfe;border-radius:var(--r-sm);background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:700;cursor:pointer">Ver</button>' +
       '</div>';
     }).join('');
     area.innerHTML =
-      '<div style="width:100%;max-width:520px;margin:0 auto">' +
-        '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#1d4ed8;margin-bottom:12px;text-align:center">&#x1F4CC; Este puesto existe en ' + todasInstancias.length + ' \xE1reas</div>' +
-        '<div style="background:var(--surface);border:1px solid #bfdbfe;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh)">' + areaRows + '</div>' +
-        '<div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3)">Seleccion\xE1 un \xE1rea para ver la ubicaci\xF3n en el organigrama</div>' +
+      '<div style="width:100%;max-width:540px;margin:0 auto">' +
+        '<div style="text-align:center;margin-bottom:16px">' +
+          '<div style="display:inline-flex;align-items:center;gap:8px;background:#1d4ed8;color:#fff;padding:7px 16px;border-radius:24px;font-size:12px;font-weight:700">' +
+            '<svg style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+            (d.nombreCargo || '') +
+          '</div>' +
+          '<div style="font-size:11px;color:var(--text2);margin-top:8px">Este puesto es transversal: existe en <b>' + areasUnicas.length + ' \xE1reas</b></div>' +
+        '</div>' +
+        '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh)">' + areaRows + '</div>' +
       '</div>';
     document.getElementById('org-loc-overlay').style.display = 'flex';
     document.body.style.overflow = 'hidden';
