@@ -2238,21 +2238,21 @@ function renderizarOrganigrama() {
     return;
   }
 
-  var dirs = DATOS.filter(function(d){
-    return d.nivel === 'Direcci\xF3n' && d.secretaria === filtroSecOrg;
+  var unidadesTotal = DATOS.filter(function(d){
+    return d.tipoRegistro !== 'nojerarquico' && d.secretaria === filtroSecOrg;
   });
-  if (dirs.length === 0) {
+  if (unidadesTotal.length === 0) {
     area.innerHTML = '<div class="empty-state"><div class="es-icon"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="es-title">Sin datos</div></div>';
     return;
   }
-  var grupos = {};
-  dirs.forEach(function(d){
-    var s = d.secretaria || 'Entes Aut\xE1rquicos';
-    if (!grupos[s]) grupos[s] = [];
-    grupos[s].push(d);
-  });
+  // Agrupar todas las unidades jerárquicas por secretaría (no solo Direcciones)
+  var secSet = {};
+  DATOS.filter(function(u){ return u.tipoRegistro !== 'nojerarquico' && u.secretaria; })
+    .forEach(function(u){ secSet[u.secretaria] = true; });
+  var secsConUnidades = Object.keys(secSet).sort();
+
   var html = '<div style="display:flex;flex-direction:column;gap:40px;width:100%">';
-  Object.keys(grupos).forEach(function(s){
+  secsConUnidades.filter(function(s){ return s === filtroSecOrg; }).forEach(function(s){
     var partes = s.split('\u2014');
     var nombre = partes[1] ? partes[1].trim() : s;
     var cod    = partes[0].trim();
@@ -2260,6 +2260,16 @@ function renderizarOrganigrama() {
       return u.tipoRegistro !== 'nojerarquico' && u.secretaria === s
         && (u.nivel === 'Direcci\xF3n' || u.nivel === 'Departamento' || u.nivel === 'Divisi\xF3n' || u.nivel === 'Secci\xF3n');
     });
+    // Raíces: unidades que no tienen ningún ancestro en unidadesSec
+    // (ninguna otra unidad tiene un código que sea prefijo propio del suyo)
+    var raices = unidadesSec.filter(function(u){
+      var uc = String(u.codigo);
+      return !unidadesSec.some(function(z){
+        var zc = String(z.codigo);
+        return zc !== uc && uc.indexOf(zc) === 0;
+      });
+    }).sort(function(a,b){ return String(a.codigo).localeCompare(String(b.codigo)); });
+
     html += '<div style="display:flex;flex-direction:column;align-items:center">' +
         '<div class="org-node secretaria" style="min-width:180px;max-width:220px">' +
           '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span>' +
@@ -2268,7 +2278,7 @@ function renderizarOrganigrama() {
         '</div>' +
       '<div class="org-stem-down"></div>' +
       '<div class="org-children">' +
-        grupos[s].map(function(d){
+        raices.map(function(d){
           return '<div class="org-child"><div class="org-stem-v"></div>' +
             nodoOrgHtml(d, unidadesSec) +
           '</div>';
