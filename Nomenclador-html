@@ -1651,16 +1651,16 @@ function renderizarCatEscalafon() {
   if (!cont) return;
 
   var REQUISITOS_CAT = [
-    { cat: '8',  desc: 'No requieren secundario de forma excluyente.' },
-    { cat: '10', desc: 'No requieren secundario. Requieren conocimientos espec\xEDficos b\xE1sicos para la ejecuci\xF3n de tareas, o implican abordaje de situaciones sociales complejas.' },
-    { cat: '12', desc: 'Secundario completo (como requisito excluyente).' },
-    { cat: '14', desc: 'Secundario completo excluyente, sumado a Oficiales de oficios t\xE9cnicos con suficiente experticia/idoneidad, o abordaje de situaciones sociales complejas.' },
-    { cat: '16', desc: 'Jefaturas de secci\xF3n, o coordinaciones/supervisiones/lideran personal a\xFAn sin puesto jer\xE1rquico.' },
-    { cat: '17', desc: 'Formaci\xF3n de pregrado, educaci\xF3n superior no universitaria excluyente.' },
-    { cat: '19', desc: 'Formaci\xF3n de grado (Universitario) excluyente — Divisiones.' },
-    { cat: '21', desc: 'Jefaturas de Departamento.' },
-    { cat: '23', desc: 'Direcci\xF3n.' }
-  ];
+    { cat: '8', desc: 'No requieren secundario de forma excluyente' },
+    { cat: '10', desc: 'No requieren secundario. Requieren conocimientos específicos básicos para la ejecución de tareas. O implican abordaje de situaciones sociales complejas' },
+    { cat: '12', desc: 'Secundario completo (como requisito excluyente)' },
+    { cat: '14', desc: 'Secundario completo excluyente, sumado a Oficiales de oficios técnicos con la suficiente experticia/idoneidad o abordaje de situaciones sociales complejas' },
+    { cat: '16', desc: 'Jefaturas de sección, o coordinaciones/supervisiones/lideran personal aún sin puesto jerárquico' },
+    { cat: '17', desc: 'Formación de pregrado, educación superior no universitaria excluyente' },
+    { cat: '19', desc: 'Formación de grado (Universitario) excluyente — Divisiones' },
+    { cat: '21', desc: 'Jefaturas de Departamento' },
+    { cat: '23', desc: 'Direcciones' }
+  ]
 
   var tablaHtml =
     '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--sh)">' +
