@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nomenclador Municipal &#x2014; MSCB</title>
+<title>Nomenclador de Puestos Municipales &#x2014; MSCB</title>
 <style>
 :root {
   --navy: #0b1d3a;
@@ -500,7 +500,7 @@ body {
       <div class="inicio-hero">
         <div class="hero-label">Municipalidad de San Carlos de Bariloche</div>
         <h1 class="hero-title">Nomenclador de<br><span>Puestos y &#xC1;reas Municipales</span></h1>
-        <p class="hero-sub">Visualizador del organigrama municipal, descripciones de puestos y gesti&#xF3;n de solicitudes.</p>
+        <p class="hero-sub">Visualizador de descripciones de puesto, seg&#xFA;n organigrama o tipo de puesto, y gesti&#xF3;n de solicitudes.</p>
         <div class="hero-stats">
           <div class="hero-stat"><span class="hs-num" id="stat-puestos">&ndash;</span><span class="hs-label">Cargos registrados</span></div>
           <div class="hero-stat"><span class="hs-num" id="stat-areas">&ndash;</span><span class="hs-label">&#xC1;reas / Secretar&#xED;as</span></div>
@@ -1092,9 +1092,7 @@ function renderizarNomenclador() {
       var partes = d.secretaria.split('\u2014');
       secNombre = partes[1] ? partes[1].trim() : d.secretaria;
     }
-    var areasMeta = (grupo && grupo.length > 1)
-      ? grupo.map(function(g){ var p=(g.secretaria||'').split('\u2014'); return '<span style="display:inline-block;padding:1px 7px;border-radius:20px;background:#dbeafe;color:#1e40af;font-size:10px;font-weight:600;margin-right:3px">'+(p[1]?p[1].trim():g.secretaria)+'</span>'; }).join('')
-      : (secNombre ? '<span class="nc-sec">&middot; ' + secNombre + '</span>' : '');
+    var areasMeta = secNombre ? '<span class="nc-sec">&middot; ' + secNombre + '</span>' : '';
     var esNoJer = d.tipoRegistro === 'nojerarquico';
     return '<div class="nom-card" onclick="abrirDetalle(\'' + esc(d.codigo) + '\', \'' + (d.tipoRegistro || 'jerarquico') + '\')" id="nc_' + esc(d.codigo) + '">' +
       '<div class="nc-nivel ' + nc + '">' + (esNoJer ? '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' : (NIVEL_ICONS[d.nivel] || '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>')) + '</div>' +
@@ -1112,7 +1110,7 @@ function renderizarNomenclador() {
           (d.tipoPuesto ? '<span class="nc-tag puesto"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg> ' + d.tipoPuesto + '</span>' : '') +
           '<span class="nc-tag ' + oc + '">' + (d.orientacion || '') + '</span>' +
           (d.requiereTitulo === 'S\xED' ? '<span class="nc-tag" style="background:#fef3c7;color:#92400e"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg> T\xEDtulo</span>' : '') +
-          (grupo && grupo.length > 1 ? '<span class="nc-tag" style="background:#ede9fe;color:#5b21b6">' + grupo.length + ' \xE1reas</span>' : '') +
+
         '</div>' +
       '</div>' +
       '<div class="nc-right"><span class="nc-arrow">&#x203A;</span></div>' +
