@@ -294,7 +294,7 @@ function getDatosCombinados() {
           secretaria:        sec,
           dependencia:       depCode,
           misionGenerica:    '',
-          misionEspecifica:  String(f[9] || '').trim(),
+          misionEspecifica:  String(f[10] || '').trim(),
           requiereTitulo:    String(f[3] || '').trim() !== '' ? 'S\xED' : 'No',
           requiereMatricula: 'No',
           normativa:         '',
