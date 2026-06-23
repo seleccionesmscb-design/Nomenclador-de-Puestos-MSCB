@@ -1662,43 +1662,62 @@ function irAOrganigrama() {
   }
 
   if (esNoJer) {
-    // ── No Jerárquicos: secretaría + lista agrupada por tipo ──
-    var puestosSecr = DATOS.filter(function(r){
-      return r.secretaria === sec && r.tipoRegistro === 'nojerarquico';
-    });
-    var grupos = {};
-    puestosSecr.forEach(function(r){
-      var t = r.tipoPuesto || 'Sin tipo';
-      if (!grupos[t]) grupos[t] = [];
-      grupos[t].push(r);
-    });
+    // ── No Jerárquico: trazar ruta hasta la unidad de dependencia ──
+    // d.dependencia contiene el código de la unidad padre (ej: "1010400001004")
+    var depRaw    = (d.dependencia || '').trim();
+    var codigoDep = depRaw.split('—')[0].trim().split(' ')[0].trim();
+    var unidadDep = DATOS.filter(function(r){ return r.codigo === codigoDep; })[0];
 
-    var html = '<div style="display:flex;flex-direction:column;align-items:center;width:100%">' +
-      '<div class="org-node secretaria" style="min-width:200px;max-width:260px">' +
-        '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span>' +
-        '<div class="on-nombre">' + secNom + '</div>' +
-        '<div class="on-codigo">C\xF3d. \xC1REA ' + secCod + '</div>' +
-      '</div>' +
-      '<div class="org-stem-down" style="height:28px"></div>' +
-      '<div style="width:100%;border-top:2px dashed var(--border2);padding-top:20px">' +
-        '<div style="text-align:center;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px">Puestos No Jer\xE1rquicos</div>';
-
-    Object.keys(grupos).sort().forEach(function(tipo){
-      html += '<div style="margin-bottom:20px">' +
-        '<div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:8px;padding-left:4px">' + tipo + '</div>' +
-        '<div style="display:flex;flex-wrap:wrap;gap:8px">';
-      grupos[tipo].forEach(function(r){
-        var esTarget = r.codigo === codigoTarget;
-        html += '<div id="orgloc-node-' + esc(r.codigo) + '" class="org-node jefatura' + (esTarget ? ' destacado' : '') + '" ' +
-          'onclick="abrirDetalle(\'' + esc(r.codigo) + '\',\'nojerarquico\')" ' +
-          'title="' + (r.nombreCargo || '') + '" style="min-width:110px;max-width:150px">' +
-            '<div class="on-nombre" style="font-size:10px">' + (r.nombreCargo || '').substring(0, 28) + '</div>' +
-            '<div class="on-codigo" style="font-size:9px;margin-top:3px">' + (r.codigo || '') + '</div>' +
+    function svgNodo(tipo) {
+      if (tipo === 'sec') return '<rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/>';
+      return '<rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/>';
+    }
+    function orgNodoHtml(item, clase) {
+      return '<div id="orgloc-node-' + esc(item.codigo) + '" class="org-node ' + clase + '" ' +
+        'onclick="abrirDetalle(\'' + esc(item.codigo) + '\',\'jerarquico\')" style="min-width:160px;max-width:240px">' +
+          '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + svgNodo(clase) + '</svg></span>' +
+          '<div class="on-nombre">' + (item.nombreCargo || '') + '</div>' +
+          '<div class="on-codigo">' + (item.codigo || '') + '</div>' +
         '</div>';
+    }
+
+    var html = '<div style="display:flex;flex-direction:column;align-items:center;min-width:220px">';
+
+    html += '<div class="org-node secretaria" style="min-width:180px;max-width:240px">' +
+      '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + svgNodo('sec') + '</svg></span>' +
+      '<div class="on-nombre">' + secNom + '</div>' +
+      '<div class="on-codigo">C\xF3d. \xC1REA ' + secCod + '</div>' +
+    '</div>';
+
+    if (unidadDep) {
+      var cadena = DATOS.filter(function(r){
+        return r.tipoRegistro !== 'nojerarquico'
+          && r.codigo !== codigoDep
+          && codigoDep.startsWith(r.codigo)
+          && r.secretaria === sec;
       });
-      html += '</div></div>';
-    });
-    html += '</div></div>';
+      cadena.sort(function(a, b){ return a.codigo.length - b.codigo.length; });
+      cadena.push(unidadDep);
+
+      cadena.forEach(function(nodo){
+        var clase = nodo.nivel === 'Direcci\xF3n' ? 'direccion' : 'jefatura';
+        html += '<div class="org-stem-down"></div>' + orgNodoHtml(nodo, clase);
+      });
+    } else {
+      html += '<div class="org-stem-down"></div>' +
+        '<div style="font-size:11px;color:var(--text3);text-align:center;padding:12px 0">' +
+          (depRaw ? 'Unidad "' + depRaw + '" no encontrada en los datos jer\xE1rquicos' : 'Dependencia no registrada') +
+        '</div>';
+    }
+
+    html += '<div class="org-stem-down"></div>' +
+      '<div id="orgloc-node-' + esc(codigoTarget) + '" class="org-node jefatura destacado" style="min-width:180px;max-width:260px;cursor:default">' +
+        '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin-bottom:4px">' + (d.tipoPuesto || 'No Jer\xE1rquico') + '</div>' +
+        '<div class="on-nombre" style="font-size:12px">' + (d.nombreCargo || '') + '</div>' +
+        '<div class="on-codigo">' + codigoTarget + '</div>' +
+      '</div>';
+
+    html += '</div>';
     area.innerHTML = html;
 
   } else {
