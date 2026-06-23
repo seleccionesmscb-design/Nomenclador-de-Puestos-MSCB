@@ -1549,73 +1549,101 @@ function volverAreas() {
 // ============================================================
 // CATEGORÍAS
 // ============================================================
+function toggleBloque(id) {
+  var el  = document.getElementById(id);
+  var btn = document.getElementById(id + '-btn');
+  if (!el) return;
+  var oculto = el.style.display === 'none';
+  el.style.display = oculto ? '' : 'none';
+  if (btn) btn.textContent = oculto ? '▲' : '▼';
+}
+
+function toggleSubOrient(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
 function renderizarCategorias() {
   var cont = document.getElementById('categorias-content');
   if (!cont) return;
-
   var html = '';
 
-  // BLOQUE 1: EJES (Direcciones por Secretaría)
+  // ── BLOQUE 1: EJES ──
   var secsMap = {};
-  DATOS.filter(function(d) { return d.nivel === 'Direcci\xF3n'; }).forEach(function(d) {
+  DATOS.filter(function(d){ return d.nivel === 'Direcci\xF3n'; }).forEach(function(d){
     var s = d.secretaria || 'Entes Aut\xE1rquicos';
     if (!secsMap[s]) secsMap[s] = [];
     secsMap[s].push(d);
   });
   var secKeys = Object.keys(secsMap).sort();
-  
+
   html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--sh)">';
-  html += '<div id="ejes-header" onclick="document.getElementById(\'ejes-list\').style.display = document.getElementById(\'ejes-list\').style.display===\'none\'?\'\':\'none\'; document.getElementById(\'ejes-arrow\').textContent = document.getElementById(\'ejes-list\').style.display===\'none\'?\'▼\':\'▲\';" style="padding:14px 20px;cursor:pointer;background:#f0f7ff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">';
-  html += '<div style="display:flex;align-items:center;gap:10px"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg><span style="font-size:13px;font-weight:700;color:var(--navy)">Ejes (Secretar\xEDas)</span></div>';
-  html += '<span id="ejes-arrow" style="font-size:12px;color:var(--text2)">▲</span></div>';
-  html += '<div id="ejes-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:6px">';
-  secKeys.forEach(function(s) {
-    var partes = s.split('\u2014');
+  html += '<div onclick="toggleBloque(\'cat-ejes\')" style="padding:14px 20px;cursor:pointer;background:#f0f7ff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">';
+  html += '<div style="display:flex;align-items:center;gap:10px"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg>';
+  html += '<span style="font-size:13px;font-weight:700;color:var(--navy)">Ejes (Secretar\xEDas y Direcciones)</span></div>';
+  html += '<span id="cat-ejes-btn" style="font-size:12px;color:var(--text2)">▲</span></div>';
+  html += '<div id="cat-ejes" style="padding:12px 16px;display:flex;flex-direction:column;gap:6px">';
+  secKeys.forEach(function(s){
+    var partes = s.split('—');
     var nombre = partes[1] ? partes[1].trim() : s;
-    html += '<div style="padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .15s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'"><span style="font-size:12.5px;font-weight:600;color:var(--navy)">' + nombre + '</span><span style="font-size:10px;color:var(--text3)">' + secsMap[s].length + ' direcci\xF3n' + (secsMap[s].length !== 1 ? 'es' : '') + '</span></div>';
+    var dirs   = secsMap[s];
+    html += '<div style="padding:8px 12px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:space-between">';
+    html += '<span style="font-size:12.5px;font-weight:600;color:var(--navy)">' + nombre + '</span>';
+    html += '<span style="font-size:10px;color:var(--text3)">' + dirs.length + ' direcci\xF3n' + (dirs.length !== 1 ? 'es' : '') + '</span>';
+    html += '</div>';
   });
   html += '</div></div>';
 
-  // BLOQUE 2: TIPO DE PUESTOS
-  var byType = {};
-  DATOS.forEach(function(d) {
-    var esNoJer = d.tipoRegistro === 'nojerarquico';
-    var typeMain = esNoJer ? 'No Jer\xE1rquico' : 'Jer\xE1rquico';
-    if (!byType[typeMain]) byType[typeMain] = { all: [], sub: {} };
-    byType[typeMain].all.push(d);
-    var orient = d.orientacion || 'Sin clasificar';
-    if (!byType[typeMain].sub[orient]) byType[typeMain].sub[orient] = [];
-    byType[typeMain].sub[orient].push(d);
-  });
-  
-  html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--sh)">';
-  html += '<div id="tipos-header" onclick="document.getElementById(\'tipos-list\').style.display = document.getElementById(\'tipos-list\').style.display===\'none\'?\'\':\'none\'; document.getElementById(\'tipos-arrow\').textContent = document.getElementById(\'tipos-list\').style.display===\'none\'?\'▼\':\'▲\';" style="padding:14px 20px;cursor:pointer;background:#f0fdf4;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">';
-  html += '<div style="display:flex;align-items:center;gap:10px"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg><span style="font-size:13px;font-weight:700;color:var(--navy)">Tipo de Puestos</span></div>';
-  html += '<span id="tipos-arrow" style="font-size:12px;color:var(--text2)">▲</span></div>';
-  html += '<div id="tipos-list" style="padding:12px 16px">';
-  
-  ['Jer\xE1rquico', 'No Jer\xE1rquico'].forEach(function(tk) {
-    if (!byType[tk]) return;
-    var allPos = byType[tk].all;
-    var subOrient = byType[tk].sub;
-    var orientKeys = Object.keys(subOrient).sort();
-    html += '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">' + tk + ' (' + allPos.length + ')</div>';
-    html += '<div style="margin-left:10px;display:flex;flex-direction:column;gap:4px">';
-    orientKeys.forEach(function(ok) {
-      var cnt = subOrient[ok].length;
-      var idSub = 'sub-' + tk.replace(/\s/g, '_') + '_' + ok.replace(/\s/g, '_');
-      html += '<button onclick="var el=document.getElementById(\'' + idSub + '\'); el.style.display=el.style.display===\'none\'?\'\':\'none\';" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);font-size:10px;font-weight:600;color:var(--text2);cursor:pointer;width:100%;justify-content:space-between">';
-      html += '<span>' + ok + ' (' + cnt + ')</span><svg style="width:10px;height:10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>';
-      html += '<div id="' + idSub + '" style="display:none;margin-top:4px;padding-left:12px;border-left:2px solid var(--border);display:flex;flex-direction:column;gap:3px">';
-      subOrient[ok].forEach(function(p) {
-        html += '<div onclick="abrirDetalle(\'' + esc(p.codigo) + '\',\'' + esc(p.tipoRegistro || 'jerarquico') + '\')" style="padding:4px 8px;border-radius:6px;cursor:pointer;font-size:10.5px;color:var(--text);display:flex;align-items:center;gap:6px;transition:background .15s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'"><span style="font-family:Courier New,monospace;font-size:9px;color:var(--text3);min-width:60px">' + (p.codigo || '') + '</span><span style="font-weight:600;flex:1">' + (p.nombreCargo || '') + '</span></div>';
-      });
-      html += '</div>';
+  // ── BLOQUE 2: TIPO DE PUESTOS ──
+  var jerarq  = DATOS.filter(function(d){ return d.tipoRegistro !== 'nojerarquico'; });
+  var nojerarq = DATOS.filter(function(d){ return d.tipoRegistro === 'nojerarquico'; });
+
+  function orientMap(lista) {
+    var m = {};
+    lista.forEach(function(d){
+      var o = d.orientacion || 'Sin clasificar';
+      if (!m[o]) m[o] = [];
+      m[o].push(d);
     });
-    html += '</div></div>';
-  });
-  
+    return m;
+  }
+
+  function renderTipoBloque(lista, label, colorBg, idPrefix) {
+    if (lista.length === 0) return '';
+    var oMap = orientMap(lista);
+    var oKeys = Object.keys(oMap).sort();
+    var out = '<div style="margin-bottom:14px">';
+    out += '<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;padding:4px 8px;background:' + colorBg + ';border-radius:6px">' + label + ' (' + lista.length + ')</div>';
+    oKeys.forEach(function(ok){
+      var items = oMap[ok];
+      var subId = idPrefix + '_' + ok.replace(/[^a-zA-Z0-9]/g,'_');
+      out += '<div style="margin-bottom:6px">';
+      out += '<button onclick="toggleSubOrient(\'' + subId + '\')" style="width:100%;display:inline-flex;align-items:center;justify-content:space-between;padding:5px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);font-size:11px;font-weight:600;color:var(--text2);cursor:pointer">';
+      out += '<span>' + ok + ' (' + items.length + ')</span>';
+      out += '<svg style="width:10px;height:10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>';
+      out += '<div id="' + subId + '" style="display:none;padding-left:10px;border-left:2px solid var(--border);margin-top:4px">';
+      items.forEach(function(p){
+        out += '<div onclick="abrirDetalle(\'' + esc(p.codigo) + '\',\'' + esc(p.tipoRegistro || 'jerarquico') + '\')" style="padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--text);display:flex;align-items:center;gap:6px;transition:background .15s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'">';
+        out += '<span style="font-family:Courier New,monospace;font-size:9px;color:var(--text3);min-width:60px">' + (p.codigo || '') + '</span>';
+        out += '<span style="font-weight:600;flex:1">' + (p.nombreCargo || '') + '</span></div>';
+      });
+      out += '</div></div>';
+    });
+    out += '</div>';
+    return out;
+  }
+
+  html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--sh)">';
+  html += '<div onclick="toggleBloque(\'cat-tipos\')" style="padding:14px 20px;cursor:pointer;background:#f0fdf4;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">';
+  html += '<div style="display:flex;align-items:center;gap:10px"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>';
+  html += '<span style="font-size:13px;font-weight:700;color:var(--navy)">Tipo de Puestos</span></div>';
+  html += '<span id="cat-tipos-btn" style="font-size:12px;color:var(--text2)">▲</span></div>';
+  html += '<div id="cat-tipos" style="padding:16px">';
+  html += renderTipoBloque(jerarq,   'Jer\xE1rquico',    '#eff6ff', 'jq');
+  html += renderTipoBloque(nojerarq, 'No Jer\xE1rquico', '#fdf4ff', 'nj');
   html += '</div></div>';
+
   cont.innerHTML = html;
 }
 
