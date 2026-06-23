@@ -257,15 +257,33 @@ function getDatosCombinados() {
     var hojaNoJer = ss.getSheetByName(HOJA_NO_JER);
     if (!hojaNoJer) return { ok: false, datos: [], mensaje: 'Hoja BD_Puestos_NoJerarquicos no encontrada' };
 
+    // Mapa prefix → secretaría para derivar la secretaría desde el código de dependencia
+    var SEC_POR_PREFIJO = {
+      '101':'101 — Intendencia',
+      '102':'102 — Sec. Legal y T\xE9cnica',
+      '103':'103 — Sec. Coord. Obras y Servicios',
+      '104':'104 — Sec. de Deportes',
+      '105':'105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n',
+      '106':'106 — Sec. de Hacienda',
+      '107':'107 — Sec. Obras y Servicios P\xFAblicos',
+      '108':'108 — Sec. Planeamiento Territorial',
+      '109':'109 — Sec. Capital Humano y Acci\xF3n Social',
+      '110':'110 — Sec. Producci\xF3n y Empleo',
+      '111':'111 — Sec. Protecci\xF3n Ciudadana',
+      '112':'112 — Sec. de Turismo'
+    };
+
     var valNoJer = hojaNoJer.getDataRange().getValues();
     var datosNoJer = valNoJer.slice(FILA_DATA_INICIO - 1)
       .filter(function(f) {
         return String(f[0] || '').trim() !== '' && String(f[1] || '').trim() !== '';
       })
       .map(function(f) {
-        var tipo   = String(f[2] || '').trim();
-        var codigo = String(f[0] || '').trim();
-        var sec    = String(f[8] || '').trim() || SECRETARIA_NOJER[codigo] || '';
+        var tipo       = String(f[2] || '').trim();
+        var codigo     = String(f[0] || '').trim();
+        var depCode    = String(f[10] || '').trim(); // columna C: código jerárquico de dependencia
+        var secFromDep = depCode ? (SEC_POR_PREFIJO[depCode.substring(0, 3)] || '') : '';
+        var sec        = String(f[8] || '').trim() || secFromDep || SECRETARIA_NOJER[codigo] || '';
         return {
           tipoRegistro:      'nojerarquico',
           codigo:            codigo,
@@ -275,8 +293,9 @@ function getDatosCombinados() {
           codigoPuesto:      '',
           orientacion:       orientacionDesdeTipo_(tipo),
           secretaria:        sec,
+          dependencia:       depCode,
           misionGenerica:    '',
-          misionEspecifica:  String(f[9] || '').trim(),
+          misionEspecifica:  '',
           requiereTitulo:    String(f[3] || '').trim() !== '' ? 'S\xED' : 'No',
           requiereMatricula: 'No',
           normativa:         '',
@@ -286,10 +305,12 @@ function getDatosCombinados() {
         };
       });
 
-    // Expandir puestos transversales: replicar uno por cada secretaría de planta
+    // Los puestos transversales (GG_A_30, GSA_AG_2025) ahora tienen asignación específica
+    // en la columna de dependencia (f[10]), por lo que ya no se replican por secretaría.
     var datosNoJerExpandido = [];
     datosNoJer.forEach(function(item) {
-      if (CODIGOS_TRANSVERSALES.indexOf(item.codigo) !== -1) {
+      if (CODIGOS_TRANSVERSALES.indexOf(item.codigo) !== -1 && !item.dependencia) {
+        // Solo replicar si NO tienen dependencia específica asignada
         SECRETARIAS_PLANTA.forEach(function(sec) {
           var copia = {};
           for (var k in item) copia[k] = item[k];
@@ -338,30 +359,43 @@ function getDetallePuesto(codigo, tipoRegistro) {
       if (!filaCargo) return { ok: false, mensaje: 'Cargo no encontrado: ' + codigo };
 
       tipoPuesto = String(filaCargo[2] || '').trim();
+      var depCodeDet    = String(filaCargo[10] || '').trim(); // col C: código jerárquico de dependencia
+      var secFromDepDet = '';
+      if (depCodeDet) {
+        var SEC_MAP_DET = {
+          '101':'101 — Intendencia','102':'102 — Sec. Legal y T\xE9cnica',
+          '103':'103 — Sec. Coord. Obras y Servicios','104':'104 — Sec. de Deportes',
+          '105':'105 — Sec. Gesti\xF3n Estrat\xE9gica y Modernizaci\xF3n','106':'106 — Sec. de Hacienda',
+          '107':'107 — Sec. Obras y Servicios P\xFAblicos','108':'108 — Sec. Planeamiento Territorial',
+          '109':'109 — Sec. Capital Humano y Acci\xF3n Social','110':'110 — Sec. Producci\xF3n y Empleo',
+          '111':'111 — Sec. Protecci\xF3n Ciudadana','112':'112 — Sec. de Turismo'
+        };
+        secFromDepDet = SEC_MAP_DET[depCodeDet.substring(0, 3)] || '';
+      }
       detalle = {
         tipoRegistro:          'nojerarquico',
         codigo:                String(filaCargo[0] || '').trim(),
-        nivel:                 'No jerárquico',
+        nivel:                 'No jer\xE1rquico',
         nombreCargo:           String(filaCargo[1] || '').trim(),
         tipoPuesto:            tipoPuesto,
         codigoPuesto:          '',
         orientacion:           orientacionDesdeTipo_(tipoPuesto),
-        secretaria:            String(filaCargo[8] || '').trim() || SECRETARIA_NOJER[String(filaCargo[0] || '').trim()] || '',
-        dependencia:           String(filaCargo[9] || '').trim(),
-        misionEspecifica:      String(filaCargo[9] || '').trim(),
+        secretaria:            String(filaCargo[8] || '').trim() || secFromDepDet || SECRETARIA_NOJER[String(filaCargo[0] || '').trim()] || '',
+        dependencia:           depCodeDet,
+        misionEspecifica:      '',
         requisitosEspecificos: '',
         titulacion:            String(filaCargo[3] || '').trim(),
-        requiereTitulo:        String(filaCargo[3] || '').trim() !== '' ? 'Sí' : 'No',
+        requiereTitulo:        String(filaCargo[3] || '').trim() !== '' ? 'S\xED' : 'No',
         requiereMatricula:     'No',
         categoria:             String(filaCargo[4] || '').trim(),
         contexto:              String(filaCargo[5] || '').trim(),
         adicional1:              String(filaCargo[6]  || '').trim(),
         adicional2:              String(filaCargo[7]  || '').trim(),
         normativa:               '',
-        competenciasPrincipales: String(filaCargo[10] || '').trim(),
-        competenciasSecundarias: String(filaCargo[11] || '').trim(),
-        resultadosIndicadores:   String(filaCargo[12] || '').trim(),
-        responsabilidades:       String(filaCargo[13] || '').trim(),
+        competenciasPrincipales: String(filaCargo[12] || '').trim(),
+        competenciasSecundarias: String(filaCargo[13] || '').trim(),
+        resultadosIndicadores:   String(filaCargo[14] || '').trim(),
+        responsabilidades:       String(filaCargo[15] || '').trim(),
         puestoGenerico:          null
       };
 
