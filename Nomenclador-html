@@ -1664,11 +1664,25 @@ function irAOrganigrama() {
   if (esNoJer) {
     // ── No Jerárquico: trazar ruta hasta la unidad de dependencia ──
     var depRaw    = (d.dependencia || '').trim();
-    // Buscar primero por código numérico, luego por nombre exacto
+    // Buscar primero por código numérico, luego por nombre normalizado
     var codigoDep = depRaw.split('—')[0].trim().split(' ')[0].trim();
     var unidadDep = DATOS.filter(function(r){ return r.tipoRegistro !== 'nojerarquico' && r.codigo === codigoDep; })[0];
     if (!unidadDep && depRaw) {
-      unidadDep = DATOS.filter(function(r){ return r.tipoRegistro !== 'nojerarquico' && r.nombreCargo === depRaw; })[0];
+      function normStr(s) {
+        return String(s||'').toLowerCase().trim()
+          .replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i')
+          .replace(/[óòö]/g,'o').replace(/[úùü]/g,'u').replace(/ñ/g,'n');
+      }
+      var depNorm = normStr(depRaw);
+      unidadDep = DATOS.filter(function(r){
+        return r.tipoRegistro !== 'nojerarquico' && normStr(r.nombreCargo) === depNorm;
+      })[0];
+      // Si no hay coincidencia exacta, buscar por inclusión
+      if (!unidadDep) {
+        unidadDep = DATOS.filter(function(r){
+          return r.tipoRegistro !== 'nojerarquico' && (normStr(r.nombreCargo).indexOf(depNorm) !== -1 || depNorm.indexOf(normStr(r.nombreCargo)) !== -1);
+        })[0];
+      }
       if (unidadDep) codigoDep = unidadDep.codigo;
     }
 
