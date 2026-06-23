@@ -281,7 +281,7 @@ function getDatosCombinados() {
       .map(function(f) {
         var tipo       = String(f[2] || '').trim();
         var codigo     = String(f[0] || '').trim();
-        var depCode    = String(f[10] || '').trim(); // columna C: código jerárquico de dependencia
+        var depCode    = String(f[9] || '').trim(); // columna J: código jerárquico de dependencia
         var secFromDep = depCode ? (SEC_POR_PREFIJO[depCode.substring(0, 3)] || '') : '';
         var sec        = String(f[8] || '').trim() || secFromDep || SECRETARIA_NOJER[codigo] || '';
         return {
@@ -306,7 +306,7 @@ function getDatosCombinados() {
       });
 
     // Los puestos transversales (GG_A_30, GSA_AG_2025) ahora tienen asignación específica
-    // en la columna de dependencia (f[10]), por lo que ya no se replican por secretaría.
+    // en la columna de dependencia (f[9]), por lo que ya no se replican por secretaría.
     var datosNoJerExpandido = [];
     datosNoJer.forEach(function(item) {
       if (CODIGOS_TRANSVERSALES.indexOf(item.codigo) !== -1 && !item.dependencia) {
@@ -359,7 +359,7 @@ function getDetallePuesto(codigo, tipoRegistro) {
       if (!filaCargo) return { ok: false, mensaje: 'Cargo no encontrado: ' + codigo };
 
       tipoPuesto = String(filaCargo[2] || '').trim();
-      var depCodeDet    = String(filaCargo[10] || '').trim(); // col C: código jerárquico de dependencia
+      var depCodeDet    = String(filaCargo[9] || '').trim(); // col J: código jerárquico de dependencia
       var secFromDepDet = '';
       if (depCodeDet) {
         var SEC_MAP_DET = {
@@ -392,10 +392,10 @@ function getDetallePuesto(codigo, tipoRegistro) {
         adicional1:              String(filaCargo[6]  || '').trim(),
         adicional2:              String(filaCargo[7]  || '').trim(),
         normativa:               '',
-        competenciasPrincipales: String(filaCargo[12] || '').trim(),
-        competenciasSecundarias: String(filaCargo[13] || '').trim(),
-        resultadosIndicadores:   String(filaCargo[14] || '').trim(),
-        responsabilidades:       String(filaCargo[15] || '').trim(),
+        competenciasPrincipales: String(filaCargo[10] || '').trim(),
+        competenciasSecundarias: String(filaCargo[11] || '').trim(),
+        resultadosIndicadores:   String(filaCargo[12] || '').trim(),
+        responsabilidades:       String(filaCargo[13] || '').trim(),
         puestoGenerico:          null
       };
 
