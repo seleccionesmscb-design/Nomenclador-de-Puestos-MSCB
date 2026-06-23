@@ -622,6 +622,16 @@ body {
       <div class="areas-grid" id="areas-grid">
         <div class="loader-full"><div class="spinner"></div><p>Cargando &#xE1;reas&#x2026;</p></div>
       </div>
+      <div id="areas-detalle" style="display:none">
+        <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px">
+          <button onclick="volverAreas()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text2)">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Todas las &#xE1;reas
+          </button>
+          <span id="areas-detalle-titulo" style="font-size:15px;font-weight:700;color:var(--navy)"></span>
+        </div>
+        <div id="areas-detalle-lista"></div>
+      </div>
     </section>
 
     <!-- AGRUPAMIENTOS -->
@@ -941,6 +951,11 @@ function navegar(vista) {
     window.open('https://script.google.com/macros/s/AKfycbxz8LGTVnhcqLKNNGhH598OLnNtEJAe4oSyOBSTv4yoM_UQkXVNqWzK9RZt_tBVdv8c/exec', '_blank');
     return;
   }
+  // Al salir de áreas, restaurar el grid
+  if (vistaActual === 'areas' && vista !== 'areas') {
+    document.getElementById('areas-detalle').style.display = 'none';
+    document.getElementById('areas-grid').style.display = '';
+  }
   if (vistaActual === vista) return;
   document.getElementById('vista-' + vistaActual).classList.remove('activa');
   var navAnterior = document.getElementById('nav-' + vistaActual);
@@ -1048,7 +1063,28 @@ function renderizarNomenclador() {
     return;
   }
 
-  lista.innerHTML = filtrados.map(function(d){
+  // Agrupar no-jerárquicos por nombre para evitar duplicados en la lista
+  var nojerGrupos = {};
+  var nojerOrden  = [];
+  var renderItems = [];
+  filtrados.forEach(function(d) {
+    if (d.tipoRegistro === 'nojerarquico') {
+      var key = (d.nombreCargo || d.codigo).trim();
+      if (!nojerGrupos[key]) { nojerGrupos[key] = []; nojerOrden.push(key); }
+      nojerGrupos[key].push(d);
+    } else {
+      renderItems.push({ d: d, grupo: null });
+    }
+  });
+  nojerOrden.forEach(function(key) { renderItems.push({ d: nojerGrupos[key][0], grupo: nojerGrupos[key] }); });
+  renderItems.sort(function(a, b) {
+    if (ordenActual === 'nombre') return (a.d.nombreCargo || '').localeCompare(b.d.nombreCargo || '');
+    if (ordenActual === 'codigo') return (a.d.codigo || '').localeCompare(b.d.codigo || '');
+    return 0;
+  });
+
+  lista.innerHTML = renderItems.map(function(item){
+    var d = item.d, grupo = item.grupo;
     var nc = NIVEL_CLASS[d.nivel]  || 'dep';
     var oc = ORIENT_CLASS[d.orientacion] || 'adm';
     var secNombre = '';
@@ -1056,8 +1092,9 @@ function renderizarNomenclador() {
       var partes = d.secretaria.split('\u2014');
       secNombre = partes[1] ? partes[1].trim() : d.secretaria;
     }
-    // Para no jerárquicos usamos la dependencia como referencia de área
-    var refArea = secNombre || d.secretaria || '';
+    var areasMeta = (grupo && grupo.length > 1)
+      ? grupo.map(function(g){ var p=(g.secretaria||'').split('\u2014'); return '<span style="display:inline-block;padding:1px 7px;border-radius:20px;background:#dbeafe;color:#1e40af;font-size:10px;font-weight:600;margin-right:3px">'+(p[1]?p[1].trim():g.secretaria)+'</span>'; }).join('')
+      : (secNombre ? '<span class="nc-sec">&middot; ' + secNombre + '</span>' : '');
     var esNoJer = d.tipoRegistro === 'nojerarquico';
     return '<div class="nom-card" onclick="abrirDetalle(\'' + esc(d.codigo) + '\', \'' + (d.tipoRegistro || 'jerarquico') + '\')" id="nc_' + esc(d.codigo) + '">' +
       '<div class="nc-nivel ' + nc + '">' + (esNoJer ? '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' : (NIVEL_ICONS[d.nivel] || '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg>')) + '</div>' +
@@ -1065,7 +1102,7 @@ function renderizarNomenclador() {
         '<div class="nc-nombre">' + (d.nombreCargo || '') + '</div>' +
         '<div class="nc-meta">' +
           '<span class="nc-codigo">' + (esNoJer ? (d.tipoPuesto || 'No jer\xE1rquico') : (d.codigo || '')) + '</span>' +
-          (refArea ? '<span class="nc-sec">&middot; ' + refArea + '</span>' : '') +
+          areasMeta +
         '</div>' +
         '<div class="nc-tags">' +
           (esNoJer
@@ -1075,6 +1112,7 @@ function renderizarNomenclador() {
           (d.tipoPuesto ? '<span class="nc-tag puesto"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/></svg> ' + d.tipoPuesto + '</span>' : '') +
           '<span class="nc-tag ' + oc + '">' + (d.orientacion || '') + '</span>' +
           (d.requiereTitulo === 'S\xED' ? '<span class="nc-tag" style="background:#fef3c7;color:#92400e"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg> T\xEDtulo</span>' : '') +
+          (grupo && grupo.length > 1 ? '<span class="nc-tag" style="background:#ede9fe;color:#5b21b6">' + grupo.length + ' \xE1reas</span>' : '') +
         '</div>' +
       '</div>' +
       '<div class="nc-right"><span class="nc-arrow">&#x203A;</span></div>' +
@@ -1192,16 +1230,37 @@ function renderizarTabDetalle(tab) {
       html = '<div class="det-section"><div class="det-mision" style="color:var(--text3)">No hay descripci\xF3n disponible para este cargo a\xFAn.</div></div>';
     }
 
-    // Ubicación
+    // Ubicación — detectar si el puesto existe en múltiples áreas
+    var otrasInstancias = d.tipoRegistro === 'nojerarquico'
+      ? DATOS.filter(function(r){ return r.tipoRegistro === 'nojerarquico' && r.nombreCargo === d.nombreCargo && r.codigo !== d.codigo; })
+      : [];
+
+    var btnOrg = '';
+    if (otrasInstancias.length > 0) {
+      // Mostrar un botón por cada área
+      var todasInstancias = [d].concat(otrasInstancias);
+      btnOrg = todasInstancias.map(function(inst) {
+        var p = (inst.secretaria || '').split('\u2014');
+        var secLabel = p[1] ? p[1].trim() : (inst.secretaria || 'Sin área');
+        return '<button onclick="irAOrganigramaInstancia(' + JSON.stringify({codigo: inst.codigo, tipoRegistro: inst.tipoRegistro, nombreCargo: inst.nombreCargo, secretaria: inst.secretaria, dependencia: inst.dependencia, nivel: inst.nivel, tipoPuesto: inst.tipoPuesto}) + ')" ' +
+          'style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);background:var(--surface2);border-radius:var(--r-sm);font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;margin-right:6px;margin-bottom:4px">' +
+          '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' +
+          secLabel + '</button>';
+      }).join('');
+    } else {
+      btnOrg = '<button onclick="irAOrganigrama()" ' +
+        'style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);background:var(--surface2);border-radius:var(--r-sm);font-size:11px;font-weight:600;color:var(--text2);cursor:pointer">' +
+        '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' +
+        'Ver en organigrama</button>';
+    }
+
     html +=
       '<div class="det-section">' +
       '<div class="det-section-title" style="display:flex;align-items:center;justify-content:space-between">' +
         '<span><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Ubicaci\xF3n en la estructura</span>' +
-        '<button onclick="irAOrganigrama()" ' +
-          'style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);background:var(--surface2);border-radius:var(--r-sm);font-size:11px;font-weight:600;color:var(--text2);cursor:pointer">' +
-          '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' +
-          'Ver en organigrama</button>' +
       '</div>' +
+      (otrasInstancias.length > 0 ? '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Este puesto existe en ' + ([d].concat(otrasInstancias)).length + ' \xE1reas — seleccion\xE1 el organigrama a ver:</div>' : '') +
+      '<div style="margin-bottom:10px;flex-wrap:wrap;display:flex">' + btnOrg + '</div>' +
       '<div class="det-info-grid">' +
         detInfoItem('Secretar\xEDa', d.secretaria ? (d.secretaria.split('\u2014')[1] || d.secretaria).trim() : '\u2014') +
         detInfoItem('Nivel', d.nivel || '\u2014') +
@@ -1447,14 +1506,46 @@ function renderizarAreas() {
 }
 
 function filtrarPorSecretaria(sec) {
-  filtroSec = sec;
-  navegar('nomenclador');
-  setTimeout(function(){
-    document.querySelectorAll('#filtro-sec .filtro-opt').forEach(function(o){
-      o.classList.toggle('sel', o.dataset.val === sec);
-    });
-    renderizarNomenclador();
-  }, 100);
+  var partes = sec.split('—');
+  var nombre = partes[1] ? partes[1].trim() : sec;
+  document.getElementById('areas-detalle-titulo').textContent = nombre;
+
+  var puestos = DATOS.filter(function(d){ return d.secretaria === sec; });
+  var lista = document.getElementById('areas-detalle-lista');
+
+  if (puestos.length === 0) {
+    lista.innerHTML = '<div class="empty-state"><div class="es-title">Sin cargos en esta \xE1rea</div></div>';
+  } else {
+    lista.innerHTML = puestos.map(function(d){
+      var nc = NIVEL_CLASS[d.nivel] || 'dep';
+      var esNoJer = d.tipoRegistro === 'nojerarquico';
+      return '<div class="nom-card" onclick="abrirDetalle(\'' + esc(d.codigo) + '\',\'' + esc(d.tipoRegistro || 'jerarquico') + '\')">' +
+        '<div class="nc-nivel ' + nc + '">' + (esNoJer
+          ? '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+          : (NIVEL_ICONS[d.nivel] || '')) + '</div>' +
+        '<div class="nc-body">' +
+          '<div class="nc-nombre">' + (d.nombreCargo || '') + '</div>' +
+          '<div class="nc-meta"><span class="nc-codigo">' + (d.codigo || '') + '</span>' +
+            (d.dependencia ? '<span class="nc-sec">&middot; ' + d.dependencia + '</span>' : '') +
+          '</div>' +
+          '<div class="nc-tags">' +
+            (esNoJer ? '<span class="nc-tag" style="background:#fce7f3;color:#831843">No Jer\xE1rquico</span>' : '<span class="nc-tag" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border)">' + (d.nivel || '') + '</span>') +
+            (d.tipoPuesto ? '<span class="nc-tag puesto"> ' + d.tipoPuesto + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="nc-right"><span class="nc-arrow">&#x203A;</span></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  document.getElementById('areas-grid').style.display = 'none';
+  document.getElementById('areas-detalle').style.display = 'block';
+  navegar('areas');
+}
+
+function volverAreas() {
+  document.getElementById('areas-detalle').style.display = 'none';
+  document.getElementById('areas-grid').style.display = '';
 }
 
 // ============================================================
@@ -1604,6 +1695,13 @@ function toggleOrgLocSub(id) {
   if (btn) btn.innerHTML = abierto
     ? '<svg style="width:12px;height:12px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>'
     : '<svg style="width:12px;height:12px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>';
+}
+
+function irAOrganigramaInstancia(instancia) {
+  var prev = puestoDetalle;
+  puestoDetalle = instancia;
+  irAOrganigrama();
+  puestoDetalle = prev;
 }
 
 function irAOrganigrama() {
