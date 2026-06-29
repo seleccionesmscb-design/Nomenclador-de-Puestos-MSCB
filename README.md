@@ -25,7 +25,3 @@ BD_Puestos_NoJerarquicos → 392 cargos no jerárquicos activos
 2. Actualizá SPREADSHEET_ID_NOMENCLADOR en Codigo.gs con el ID de tu Google Sheet
 3. Verificá que los nombres de las hojas coincidan con las constantes HOJA_BD_NOM, HOJA_25_PUESTOS, HOJA_NO_JER
 4. Desplegar → Nueva implementación → Aplicación web
-
-## Pendiente
-- Logo en el sidebar
-- Incorporar vista de organigrama completo
