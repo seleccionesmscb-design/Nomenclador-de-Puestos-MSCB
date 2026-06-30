@@ -168,11 +168,11 @@ var SECRETARIAS_PLANTA = [
 ];
 var CODIGOS_TRANSVERSALES = ['GG_A_30', 'GSA_AG_2025'];
 
-// Niveles que NO son de planta (política/estructura) → se excluyen de la lista.
-// NOTA: 'Subsecretaría' NO se excluye acá: necesitamos las subsecretarías como
-// nivel intermedio para que el organigrama muestre la dependencia real
-// (Secretaría → Subsecretaría → Dirección). El frontend las oculta del listado
-// de puestos (ver datosFiltrados en Nomenclador.html).
+// Niveles que NO son de planta (política/estructura) → se excluyen de la lista principal.
+// NOTA: 'Subsecretaría', 'Dirección General' y 'Delegación' NO se excluyen acá:
+// los necesitamos como nodos intermedios para el organigrama
+// (Secretaría → Subsecretaría/DirGen/Delegación → Dirección).
+// El frontend los oculta del listado de puestos (ver datosFiltrados en Nomenclador.html).
 var NIVELES_EXCLUIR = ['Secretaría', 'Juzgado', 'Concejo',
                        'Tribunal', 'Defensoría', 'Instituto', 'Junta', 'Otro'];
 
