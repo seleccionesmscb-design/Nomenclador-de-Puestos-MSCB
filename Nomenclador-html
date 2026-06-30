@@ -1987,10 +1987,17 @@ function irAOrganigrama() {
     var dirs = DATOS.filter(function(r){
       return r.nivel === 'Direcci\xF3n' && r.secretaria === sec;
     });
-    // Todos los nodos intermedios (Subsecretaría, Dirección General, Delegación)
+    // Nodos intermedios: detectados por nivel O por ser ancestro de prefijo de una Dirección
     var NIVEL_INTERM = ['Subsecretar\xEDa','Direcci\xF3n General','Direcci\xF3n T\xE9cnica Contable','Delegaci\xF3n'];
     var interms = DATOS.filter(function(r){
-      return NIVEL_INTERM.indexOf(r.nivel) !== -1 && r.secretaria === sec;
+      if (r.tipoRegistro === 'nojerarquico' || r.secretaria !== sec) return false;
+      var rc = String(r.codigo);
+      var esIntermNivel = NIVEL_INTERM.indexOf(r.nivel) !== -1;
+      var esIntermPorCodigo = dirs.some(function(d){
+        var dc = String(d.codigo);
+        return dc !== rc && dc.indexOf(rc) === 0;
+      });
+      return esIntermNivel || esIntermPorCodigo;
     }).sort(function(a, b){ return String(a.codigo).localeCompare(String(b.codigo)); });
 
     if (dirs.length === 0 && interms.length === 0) {
@@ -2356,12 +2363,11 @@ function renderizarOrganigrama() {
     var partes = s.split('\u2014');
     var nombre = partes[1] ? partes[1].trim() : s;
     var cod    = partes[0].trim();
+    // Incluir TODAS las unidades jerárquicas de la secretaría.
+    // El backend ya excluye Secretaría, Juzgado, Concejo, etc. via NIVELES_EXCLUIR.
+    // El algoritmo de prefijos establece la jerarquía correctamente sin importar el nivel.
     var unidadesSec = DATOS.filter(function(u){
-      return u.tipoRegistro !== 'nojerarquico' && u.secretaria === s
-        && (u.nivel === 'Subsecretar\xEDa' || u.nivel === 'Direcci\xF3n General'
-          || u.nivel === 'Direcci\xF3n T\xE9cnica Contable' || u.nivel === 'Delegaci\xF3n'
-          || u.nivel === 'Direcci\xF3n' || u.nivel === 'Departamento'
-          || u.nivel === 'Divisi\xF3n' || u.nivel === 'Secci\xF3n');
+      return u.tipoRegistro !== 'nojerarquico' && u.secretaria === s;
     });
     // Raíces: unidades que no tienen ningún ancestro en unidadesSec
     // (ninguna otra unidad tiene un código que sea prefijo propio del suyo)
