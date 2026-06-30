@@ -44,7 +44,11 @@ ID: `16r3ZmX5rI5e6tnYyOz8e5NW6ewe7bn_vFEdyjU9Nx6Q`
 - `getDetallePuesto(codigo, tipoRegistro)` → busca el cargo en la hoja correspondiente + lookup en "25 Puestos" → devuelve `{ datos: { ...cargo, puestoGenerico: {...} } }`
 
 ## Niveles excluidos de la lista (política/no planta)
-`['Secretaría', 'Subsecretaría', 'Juzgado', 'Concejo', 'Tribunal', 'Defensoría', 'Instituto', 'Junta', 'Otro']`
+`['Secretaría', 'Juzgado', 'Concejo', 'Tribunal', 'Defensoría', 'Instituto', 'Junta', 'Otro']`
+**Subsecretaría** NO se excluye en `Codigo.gs`: llega al frontend para servir de nivel intermedio en el organigrama (Secretaría → Subsecretaría → Dirección). El frontend la oculta del listado de puestos en `datosFiltrados()`.
+
+## Jerarquía por código (BD_Nomenclador)
+Los códigos de área son posicionales: Secretaría `103` → Subsecretaría `10301` (103+01) → Dirección bajo subsec `1030100001` → Departamento `1030100001001`. Una Dirección directa de la Secretaría usa subsec `00` (ej. `1030000001`). El organigrama anida por prefijo de código (`codigoHijo.startsWith(codigoPadre)`).
 
 ## URLs del sistema
 - Web app nomenclador: `https://script.google.com/macros/s/AKfycbxWnjdPzTp2DReiIySsqe6YCOkNRA1FC2baZSC5fyOShV6JDuKyvLnmALbZi0kgj7jw/exec?page=registro`
@@ -59,4 +63,4 @@ ID: `16r3ZmX5rI5e6tnYyOz8e5NW6ewe7bn_vFEdyjU9Nx6Q`
 
 ## Pendiente
 - [ ] Logo en el sidebar (función `getLogo()` busca en `Index.html` un base64 que no existe)
-- [ ] Vista de organigrama mejorada
+- [x] Organigrama con subsecretarías como nivel intermedio (Secretaría → Subsecretaría → Dirección)

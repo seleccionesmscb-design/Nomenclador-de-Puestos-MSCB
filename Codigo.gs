@@ -168,8 +168,12 @@ var SECRETARIAS_PLANTA = [
 ];
 var CODIGOS_TRANSVERSALES = ['GG_A_30', 'GSA_AG_2025'];
 
-// Niveles que NO son de planta (política/estructura) → se excluyen de la lista
-var NIVELES_EXCLUIR = ['Secretaría', 'Subsecretaría', 'Juzgado', 'Concejo',
+// Niveles que NO son de planta (política/estructura) → se excluyen de la lista.
+// NOTA: 'Subsecretaría' NO se excluye acá: necesitamos las subsecretarías como
+// nivel intermedio para que el organigrama muestre la dependencia real
+// (Secretaría → Subsecretaría → Dirección). El frontend las oculta del listado
+// de puestos (ver datosFiltrados en Nomenclador.html).
+var NIVELES_EXCLUIR = ['Secretaría', 'Juzgado', 'Concejo',
                        'Tribunal', 'Defensoría', 'Instituto', 'Junta', 'Otro'];
 
 // Datos salariales por nivel (fuente: Tabla_nombre_puestoperfiles_categorias)

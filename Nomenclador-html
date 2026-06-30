@@ -335,6 +335,8 @@ body {
 .org-node:hover { border-color: var(--accent); box-shadow: var(--sh-lg); }
 .org-node.root { background: var(--navy); border-color: var(--navy); color: #fff; }
 .org-node.secretaria { background: #dbeafe; border-color: #93c5fd; }
+.org-node.subsecretaria { background: #eef2ff; border-color: #c7d2fe; }
+.org-node.subsecretaria .on-nombre { color: #3730a3; }
 .org-node.direccion { background: var(--surface); border-color: var(--border2); }
 .org-node.jefatura { background: var(--surface2); border-color: var(--border); font-size: 11px; }
 .org-node.destacado { border-color: var(--accent) !important; background: #eff6ff !important; box-shadow: 0 0 0 4px rgba(59,130,246,.4), var(--sh-lg) !important; animation: destacado-pulse 1s ease-in-out infinite; }
@@ -1017,6 +1019,10 @@ function poblarFiltroSecretarias() {
 
 function datosFiltrados() {
   return DATOS.filter(function(d){
+    // Las subsecretarías existen en los datos solo para armar el organigrama
+    // (nivel intermedio Secretaría → Subsecretaría → Dirección); no son puestos
+    // de planta, así que no se listan ni se buscan.
+    if (d.nivel === 'Subsecretar\xEDa') return false;
     if (filtroNivel  && d.nivel       !== filtroNivel)  return false;
     if (filtroOrient && d.orientacion !== filtroOrient) return false;
     if (filtroSec) {
@@ -1977,20 +1983,15 @@ function irAOrganigrama() {
     var dirs = DATOS.filter(function(r){
       return r.nivel === 'Direcci\xF3n' && r.secretaria === sec;
     });
+    var subsecs = DATOS.filter(function(r){
+      return r.nivel === 'Subsecretar\xEDa' && r.secretaria === sec;
+    }).sort(function(a, b){ return String(a.codigo).localeCompare(String(b.codigo)); });
 
-    if (dirs.length === 0) {
+    if (dirs.length === 0 && subsecs.length === 0) {
       area.innerHTML = '<div class="empty-state"><div class="es-title">Sin datos para esta secretar\xEDa</div></div>';
     } else {
-      var html2 = '<div style="display:flex;flex-direction:column;align-items:center;width:100%">' +
-        '<div class="org-node secretaria" style="min-width:200px;max-width:260px">' +
-          '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span>' +
-          '<div class="on-nombre">' + secNom + '</div>' +
-          '<div class="on-codigo">C\xF3d. \xC1REA ' + secCod + '</div>' +
-        '</div>' +
-        '<div class="org-stem-down"></div>' +
-        '<div class="org-children">';
-
-      dirs.forEach(function(dir){
+      // Renderiza una dirección (con sus departamentos/divisiones/secciones) como org-child
+      function renderDirHtml(dir) {
         var esDirTarget = dir.codigo === codigoTarget;
         var dirEnRuta   = String(codigoTarget).startsWith(String(dir.codigo));
 
@@ -2001,7 +2002,7 @@ function irAOrganigrama() {
             && String(sub.codigo).startsWith(String(dir.codigo));
         });
 
-        html2 += '<div class="org-child">' +
+        var html2 = '<div class="org-child">' +
           '<div class="org-stem-v"></div>' +
           '<div style="display:flex;flex-direction:column;align-items:center">' +
             '<div id="orgloc-node-' + esc(dir.codigo) + '" class="org-node direccion' + (esDirTarget ? ' destacado' : '') + '" onclick="abrirDetalle(\'' + esc(dir.codigo) + '\')" title="' + (dir.nombreCargo || '') + '">' +
@@ -2068,7 +2069,48 @@ function irAOrganigrama() {
         }
 
         html2 += '</div></div>';
+        return html2;
+      }
+
+      // Direcciones que dependen de una subsecretaría (por prefijo de código)
+      function dirsDeSubsec(ssCod) {
+        return dirs.filter(function(d){ return String(d.codigo).startsWith(String(ssCod)); });
+      }
+      // Direcciones que cuelgan directo de la secretaría (sin subsecretaría intermedia)
+      var dirsSinSub = dirs.filter(function(d){
+        return !subsecs.some(function(ss){ return String(d.codigo).startsWith(String(ss.codigo)); });
       });
+
+      var html2 = '<div style="display:flex;flex-direction:column;align-items:center;width:100%">' +
+        '<div class="org-node secretaria" style="min-width:200px;max-width:260px">' +
+          '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span>' +
+          '<div class="on-nombre">' + secNom + '</div>' +
+          '<div class="on-codigo">C\xF3d. \xC1REA ' + secCod + '</div>' +
+        '</div>' +
+        '<div class="org-stem-down"></div>' +
+        '<div class="org-children">';
+
+      // Subsecretarías (con sus direcciones anidadas)
+      subsecs.forEach(function(ss){
+        var esSsTarget = ss.codigo === codigoTarget;
+        var dirsHijas  = dirsDeSubsec(ss.codigo);
+        html2 += '<div class="org-child">' +
+          '<div class="org-stem-v"></div>' +
+          '<div style="display:flex;flex-direction:column;align-items:center">' +
+            '<div id="orgloc-node-' + esc(ss.codigo) + '" class="org-node subsecretaria' + (esSsTarget ? ' destacado' : '') + '" onclick="abrirDetalle(\'' + esc(ss.codigo) + '\')" title="' + (ss.nombreCargo || '') + '" style="min-width:160px;max-width:220px">' +
+              '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/></svg></span>' +
+              '<div class="on-nombre">' + (ss.nombreCargo || '').replace('Subsecretar\xEDa de ', 'Subsec. de ').replace('Subsecretar\xEDa ', 'Subsec. ').substring(0, 28) + '</div>' +
+              '<div class="on-codigo">' + (ss.codigo || '') + '</div>' +
+            '</div>' +
+            (dirsHijas.length > 0
+              ? '<div class="org-stem-down"></div><div class="org-children">' + dirsHijas.map(renderDirHtml).join('') + '</div>'
+              : '') +
+          '</div>' +
+        '</div>';
+      });
+
+      // Direcciones directas de la secretaría
+      dirsSinSub.forEach(function(dir){ html2 += renderDirHtml(dir); });
 
       html2 += '</div></div>';
       area.innerHTML = html2;
@@ -2175,14 +2217,17 @@ function hijosDirectosOrg(unit, unidades) {
 
 // Render recursivo de un nodo del organigrama con sus descendientes anidados
 function nodoOrgHtml(unit, unidades) {
+  var esSub  = unit.nivel === 'Subsecretar\xEDa';
   var esDir  = unit.nivel === 'Direcci\xF3n';
-  var clase  = esDir ? 'direccion' : 'jefatura';
+  var clase  = esSub ? 'subsecretaria' : (esDir ? 'direccion' : 'jefatura');
+  var conIcono = esSub || esDir;
   var nombre = (unit.nombreCargo || '');
   if (esDir) nombre = nombre.replace('Direcci\xF3n de ', 'Dir. de ');
-  var nodoStyle = esDir ? '' : ' style="min-width:104px;max-width:148px"';
+  if (esSub) nombre = nombre.replace('Subsecretar\xEDa de ', 'Subsec. de ').replace('Subsecretar\xEDa ', 'Subsec. ');
+  var nodoStyle = conIcono ? (esSub ? ' style="min-width:150px;max-width:200px"' : '') : ' style="min-width:104px;max-width:148px"';
   var nodo = '<div id="org-node-' + esc(unit.codigo) + '" class="org-node ' + clase + '" onclick="abrirDetalle(\'' + esc(unit.codigo) + '\')" title="' + (unit.nombreCargo || '') + '"' + nodoStyle + '>' +
-      (esDir ? '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/></svg></span>' : '') +
-      '<div class="on-nombre"' + (esDir ? '' : ' style="font-size:10px"') + '>' + nombre.substring(0, 30) + '</div>' +
+      (conIcono ? '<span class="on-icono"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/></svg></span>' : '') +
+      '<div class="on-nombre"' + (conIcono ? '' : ' style="font-size:10px"') + '>' + nombre.substring(0, 34) + '</div>' +
       '<div class="on-codigo">' + (unit.codigo || '') + '</div>' +
     '</div>';
 
@@ -2258,7 +2303,7 @@ function renderizarOrganigrama() {
     var cod    = partes[0].trim();
     var unidadesSec = DATOS.filter(function(u){
       return u.tipoRegistro !== 'nojerarquico' && u.secretaria === s
-        && (u.nivel === 'Direcci\xF3n' || u.nivel === 'Departamento' || u.nivel === 'Divisi\xF3n' || u.nivel === 'Secci\xF3n');
+        && (u.nivel === 'Subsecretar\xEDa' || u.nivel === 'Direcci\xF3n' || u.nivel === 'Departamento' || u.nivel === 'Divisi\xF3n' || u.nivel === 'Secci\xF3n');
     });
     // Raíces: unidades que no tienen ningún ancestro en unidadesSec
     // (ninguna otra unidad tiene un código que sea prefijo propio del suyo)
