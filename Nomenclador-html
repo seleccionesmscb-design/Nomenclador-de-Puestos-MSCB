@@ -2252,7 +2252,14 @@ function hijosDirectosOrg(unit, unidades) {
         && cc.indexOf(zc) === 0 && zc.indexOf(cod) === 0
         && zc.length > cod.length && zc.length < cc.length;
     });
-  }).sort(function(a,b){ return String(a.codigo).localeCompare(String(b.codigo)); });
+  }).sort(function(a,b){
+    var ORD = {'Subsecretar\xEDa':0,'Direcci\xF3n General':1,'Direcci\xF3n T\xE9cnica Contable':1,
+               'Delegaci\xF3n':2,'Direcci\xF3n':3,'Departamento':4,'Divisi\xF3n':5,'Secci\xF3n':6};
+    var pa = ORD[a.nivel] !== undefined ? ORD[a.nivel] : 9;
+    var pb = ORD[b.nivel] !== undefined ? ORD[b.nivel] : 9;
+    if (pa !== pb) return pa - pb;
+    return String(a.codigo).localeCompare(String(b.codigo));
+  });
 }
 
 // Render recursivo de un nodo del organigrama con sus descendientes anidados
@@ -2358,13 +2365,23 @@ function renderizarOrganigrama() {
     });
     // Raíces: unidades que no tienen ningún ancestro en unidadesSec
     // (ninguna otra unidad tiene un código que sea prefijo propio del suyo)
+    var ORG_NIV_ORDEN = {
+      'Subsecretar\xEDa': 0, 'Direcci\xF3n General': 1,
+      'Direcci\xF3n T\xE9cnica Contable': 1, 'Delegaci\xF3n': 2,
+      'Direcci\xF3n': 3, 'Departamento': 4, 'Divisi\xF3n': 5, 'Secci\xF3n': 6
+    };
     var raices = unidadesSec.filter(function(u){
       var uc = String(u.codigo);
       return !unidadesSec.some(function(z){
         var zc = String(z.codigo);
         return zc !== uc && uc.indexOf(zc) === 0;
       });
-    }).sort(function(a,b){ return String(a.codigo).localeCompare(String(b.codigo)); });
+    }).sort(function(a,b){
+      var pa = ORG_NIV_ORDEN[a.nivel] !== undefined ? ORG_NIV_ORDEN[a.nivel] : 9;
+      var pb = ORG_NIV_ORDEN[b.nivel] !== undefined ? ORG_NIV_ORDEN[b.nivel] : 9;
+      if (pa !== pb) return pa - pb;
+      return String(a.codigo).localeCompare(String(b.codigo));
+    });
 
     html += '<div style="display:flex;flex-direction:column;align-items:center">' +
         '<div class="org-node secretaria" style="min-width:180px;max-width:220px">' +
