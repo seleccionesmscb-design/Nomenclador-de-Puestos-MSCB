@@ -542,6 +542,55 @@ function orientacionDesdeTipo_(tipo) {
 
 
 // ============================================================
+// GENERAR_COD_NJ — función custom para Sheets
+// Genera el sufijo TYPE-ABREV para puestos no jerárquicos.
+// Uso en hoja: =C2 & " " & GENERAR_COD_NJ(IFERROR(VLOOKUP(A2,BD_Puestos_NoJerarquicos!B:C,2,FALSE),""), A2)
+// Ej: GENERAR_COD_NJ("Técnico/a", "Analista de RRHH") → "TEC-ARRHH"
+// ============================================================
+
+function GENERAR_COD_NJ(tipoPuesto, nombreCargo) {
+  var tipo   = String(tipoPuesto  || '').trim();
+  var nombre = String(nombreCargo || '').trim();
+
+  var TIPO_MAP = {
+    'Administrativo/a': 'ADM',
+    'Técnico/a':   'TEC',
+    'Operativo/a':      'OPE',
+    'Profesional':      'PRO'
+  };
+
+  var tipoAbrev = TIPO_MAP[tipo];
+  // Si no viene el tipo, intentar derivarlo del nombre del cargo
+  if (!tipoAbrev) {
+    var nl = nombre.toLowerCase();
+    if      (nl.indexOf('administrativ') === 0)                              tipoAbrev = 'ADM';
+    else if (nl.indexOf('técnic') === 0 || nl.indexOf('tecnic') === 0) tipoAbrev = 'TEC';
+    else if (nl.indexOf('operativ') === 0)                                   tipoAbrev = 'OPE';
+    else if (nl.indexOf('profesional') === 0)                                tipoAbrev = 'PRO';
+    else                                                                     tipoAbrev = tipo.substring(0, 3).toUpperCase() || 'NJ';
+  }
+
+  var STOP = ['de','del','la','el','los','las','al','en','y','e','a','por','para','con','un','una','su','sus'];
+
+  var abrev = '';
+  var words = nombre.split(/\s+/);
+  for (var i = 0; i < words.length && abrev.length < 5; i++) {
+    var w = words[i];
+    if (!w || STOP.indexOf(w.toLowerCase()) !== -1) continue;
+    // Quitar caracteres no alfabéticos para testear si es acrónimo (RRHH, TIC...)
+    var letras = w.replace(/[^a-zA-ZÀ-ɏ]/g, '');
+    if (letras.length > 1 && letras === letras.toUpperCase()) {
+      abrev += letras;
+    } else {
+      abrev += w.charAt(0).toUpperCase();
+    }
+  }
+
+  return tipoAbrev + '-' + abrev.substring(0, 5);
+}
+
+
+// ============================================================
 // getLogo — sin cambios
 // ============================================================
 
